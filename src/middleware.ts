@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const protectedRoutes = ["/dashboard"];
 const publicRoutes = [
   "/",
   "/login",
@@ -8,30 +9,27 @@ const publicRoutes = [
   "/forgot-password",
   "/reset-password",
   "/auth/callback",
-  "/auth/confirm-email",
-  "/about",
-  "/features",
-  "/pricing",
-  "/privacy",
-  "/terms",
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
   const isPublic = publicRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
-  if (isPublic) {
-    return NextResponse.next();
-  }
+  // Let everything through (auth handled in server layout)
+  if (isPublic) return NextResponse.next();
+
+  if (isProtected) return NextResponse.next();
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

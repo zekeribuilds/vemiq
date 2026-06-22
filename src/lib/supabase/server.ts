@@ -1,41 +1,23 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
 
-export const createClient = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  console.log('[SERVER CLIENT] Supabase init:', { url: !!url, key: !!key })
-
-  // Safeguard: Fail early with clear error if env vars are missing
-  if (!url || !key) {
-    throw new Error('Missing Supabase environment variables. Please check your .env.local file or Vercel environment variables.')
-  }
-
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies();
 
   return createServerClient(
-    url,
-    key,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          const store = cookieStore as any
-          // Handle both Next.js 14 (sync) and 15 (async) cookies
-          if (store && typeof store.get === 'function') {
-            return store.get(name)?.value
-          }
-          return undefined
+        getAll() {
+          return cookieStore.getAll();
         },
-
-        set() {
-          // NOOP — middleware owns persistence
+        setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
         },
-
-        remove() {
-          // NOOP — middleware owns persistence
-        }
-      }
+      },
     }
-  )
+  );
 }

@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.1",
-    "@supabase/supabase-js": "^2.106.2",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.108.2",
     "@tiptap/react": "^3.26.0",
     "@tiptap/starter-kit": "^3.26.0",
     "@types/puppeteer": "^5.4.7",
