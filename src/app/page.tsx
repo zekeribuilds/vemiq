@@ -33,13 +33,13 @@ export default function Home() {
                 href="/signup"
                 className="btn-primary inline-flex items-center justify-center text-sm sm:text-base py-2.5 sm:py-3"
               >
-                Start Documenting Free
+                Start Documenting
               </Link>
               <Link
                 href="/features"
                 className="btn-secondary inline-flex items-center justify-center gap-2 text-foreground text-sm sm:text-base py-2.5 sm:py-3"
               >
-                See How It Works
+                How It Works
               </Link>
             </div>
 

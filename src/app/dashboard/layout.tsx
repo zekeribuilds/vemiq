@@ -1,6 +1,5 @@
-'use client';
-
-import { ReactNode } from 'react';
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import Sidebar from '@/components/dashboard/Sidebar';
 import BottomNavigation from '@/components/mobile/BottomNavigation';
 import { DocumentsIcon } from '@/design-system';
@@ -8,11 +7,21 @@ import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
 import { EmptyState } from '@/design-system/components/EmptyState';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-background">
       {/* LEFT SIDEBAR - Navigation (Desktop Only) */}
