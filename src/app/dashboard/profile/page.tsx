@@ -52,9 +52,11 @@ export default function DashboardProfilePage() {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
+        console.log('[PROFILE] Authenticated user ID:', user?.id);
+        
         if (user) {
           // Query profiles table for user identity data
-          const { data: profileData } = await supabase
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select(`
               full_name,
@@ -64,7 +66,10 @@ export default function DashboardProfilePage() {
               current_level
             `)
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
+
+          console.log('[PROFILE] Profile query result:', profileData);
+          console.log('[PROFILE] Profile query error:', profileError);
 
           if (profileData) {
             const institutionName = (() => {

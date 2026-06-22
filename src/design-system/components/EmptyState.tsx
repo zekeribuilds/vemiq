@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Vemiq Empty State Component
  * 
@@ -23,6 +25,8 @@ export interface EmptyStateProps {
 
 export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
   ({ icon, title, description, actionLabel, onAction, className = '', style, ...props }, ref) => {
+    console.log('[EMPTY_STATE] Rendering EmptyState with title:', title);
+    
     const containerStyles: React.CSSProperties = {
       display: 'flex',
       flexDirection: 'column',
@@ -69,6 +73,46 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       lineHeight: typography.lineHeight.relaxed,
       marginBottom: spacing[24],
     };
+    
+    if (typeof motion === 'undefined') {
+      console.error('[EMPTY_STATE] motion is undefined - framer-motion not loaded correctly');
+      return (
+        <div ref={ref} className={className} style={containerStyles} {...props}>
+          {icon && (
+            <div style={iconContainerStyles}>
+              <div style={iconStyles}>{icon}</div>
+            </div>
+          )}
+          <div style={titleStyles}>{title}</div>
+          <div style={descriptionStyles}>{description}</div>
+          {actionLabel && onAction && (
+            <button
+              style={{
+                padding: `${spacing[12]} ${spacing[24]}`,
+                fontFamily: typography.fontFamily.sans,
+                fontSize: typography.fontSize.body,
+                fontWeight: typography.fontWeight.medium,
+                color: colors.text.primary,
+                backgroundColor: colors.primary.DEFAULT,
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onClick={onAction}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary.hover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary.DEFAULT;
+              }}
+            >
+              {actionLabel}
+            </button>
+          )}
+        </div>
+      );
+    }
 
     return (
       <motion.div

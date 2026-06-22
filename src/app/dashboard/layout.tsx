@@ -18,6 +18,8 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log('[DASHBOARD] Authenticated user ID:', user?.id);
+
   if (!user) {
     redirect("/login");
   }
