@@ -1,0 +1,4 @@
+-- Vemiq Database V1 - Relationship Constraints
+-- Migration: 004_relationship_constraints.sql
+-- Note: All foreign key and unique constraints are already defined in 003_core_tables.sql
+-- This file is reserved for any additional constraint modifications if needed in the future

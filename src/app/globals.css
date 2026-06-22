@@ -1,0 +1,146 @@
+@import '../styles/tokens.css';
+@import '../styles/theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    @apply antialiased m-0 p-0;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  h2 {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  h3 {
+    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
+  }
+
+  h4 {
+    @apply text-base sm:text-lg md:text-xl lg:text-2xl;
+  }
+
+  h5 {
+    @apply text-sm sm:text-base md:text-lg lg:text-xl;
+  }
+
+  h6 {
+    @apply text-xs sm:text-sm md:text-base lg:text-lg;
+  }
+
+  p {
+    color: hsl(var(--muted-foreground));
+    line-height: 1.625;
+  }
+
+  a {
+    @apply text-primary hover:text-primary dark:hover:text-white transition-colors duration-200;
+  }
+
+  button {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  input, textarea, select {
+    @apply border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 sm:px-6 py-2.5 sm:py-3 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-all duration-200 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background text-sm sm:text-base;
+  }
+
+  .btn-secondary {
+    @apply px-4 sm:px-6 py-2.5 sm:py-3 bg-transparent text-primary border border-border rounded-md font-medium hover:bg-muted transition-all duration-200 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background text-sm sm:text-base;
+  }
+
+  .btn-ghost {
+    @apply px-4 sm:px-6 py-2.5 sm:py-3 bg-transparent text-muted-foreground hover:bg-muted rounded-md font-medium transition-all duration-200 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background text-sm sm:text-base;
+  }
+
+  .card {
+    @apply bg-card border border-border rounded-md sm:rounded-lg shadow-sm;
+  }
+
+  .card-hover {
+    @apply bg-card border border-border rounded-md sm:rounded-lg shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-input border border-border rounded-md focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 outline-none text-sm sm:text-base;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary/10 text-primary;
+  }
+
+  .badge-success {
+    @apply badge bg-success/10 text-success;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning/10 text-warning;
+  }
+
+  .badge-error {
+    @apply badge bg-destructive/10 text-destructive;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-success bg-clip-text text-transparent;
+  }
+
+  .gradient-bg {
+    @apply bg-gradient-to-r from-primary to-success;
+  }
+}
+
+@layer utilities {
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 25mm;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  .a4-content {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass {
+    background-color: hsl(var(--background-secondary) / 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--neutral-800));
+  }
+
+  .glass-dark {
+    background-color: hsl(0 0% 9% / 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(0 0% 100% / 0.1);
+  }
+}
