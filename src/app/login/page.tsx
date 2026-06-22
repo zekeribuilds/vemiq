@@ -101,7 +101,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
       <Navbar />
-      <div className="flex items-center justify-center px-3 sm:px-4 pb-8 sm:pb-12 pt-32 sm:pt-24 flex-1">
+      <div className="flex items-center justify-center px-3 sm:px-4 pb-8 sm:pb-12 pt-20 sm:pt-24 flex-1">
       <div className="max-w-sm w-full relative animate-fade-in-up">
         <div className="text-center mb-4 sm:mb-6 mt-8 sm:mt-12">
           <img src="/images/logo.svg" alt="Vemiq" className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4" />
