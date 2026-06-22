@@ -5,6 +5,13 @@ import { DocumentsIcon, SparklesIcon, ZapIcon, ShieldIcon, CheckIcon, StarIcon, 
 import { Card } from '@/design-system/components/Card';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 export default function Home() {
 
@@ -21,9 +28,9 @@ export default function Home() {
 
         <div className="relative">
           <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
-            <h1 className="text-3xl sm:text-sm md:text-3xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight text-center">
-              <span className="whitespace-nowrap">Document Your SIWES Today</span><br />
-              <span className="text-2xl sm:text-xs md:text-2xl lg:text-4xl block mt-0" style={{ color: '#8661ff' }}>Generate Your Report Tomorrow</span>
+            <h1 className={`${plusJakartaSans.className} text-3xl sm:text-sm md:text-3xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight text-center`}>
+              <span className="whitespace-nowrap">Document Your SIWES</span><br />
+              <span className="text-2xl sm:text-xs md:text-2xl lg:text-4xl block mt-0" style={{ color: '#8661ff' }}>Generate Your Report</span>
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-foreground max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
               Vemiq helps students capture activities, store evidence, and organize training records throughout their industrial attachment, making report writing a structured process instead of a last-minute rush.
