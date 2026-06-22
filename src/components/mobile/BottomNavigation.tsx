@@ -16,7 +16,7 @@ export default function BottomNavigation() {
       className="fixed bottom-0 left-0 right-0 z-50"
     >
       {/* Glassmorphism Background */}
-      <div className="mx-4 mb-4 bg-surface/80 backdrop-blur-xl border border-border rounded-t-2xl shadow-2xl">
+      <div className="mx-4 mb-4 bg-surface/80 backdrop-blur-xl border border-border rounded-[100px] shadow-2xl">
         <nav className="flex items-center justify-around h-[72px] px-2">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
@@ -28,31 +28,27 @@ export default function BottomNavigation() {
                 href={item.href}
                 className="flex flex-col items-center justify-center flex-1 min-h-[44px] relative group"
               >
-                {/* Active Indicator */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeIndicator"
-                    className="absolute -top-1 w-8 h-1 bg-success rounded-full"
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                )}
-
                 {/* Icon */}
                 <Icon
                   size={24}
-                  className={`mb-1 transition-colors ${
-                    isActive ? 'text-success' : 'text-tertiary group-hover:text-quaternary'
-                  }`}
+                  className={`mb-1 transition-colors text-white`}
                 />
 
                 {/* Label */}
                 <span
-                  className={`text-xs font-medium transition-colors ${
-                    isActive ? 'text-success' : 'text-tertiary group-hover:text-quaternary'
-                  }`}
+                  className={`text-xs font-medium transition-colors text-white`}
                 >
                   {item.label}
                 </span>
+
+                {/* Active Indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeIndicator"
+                    className="absolute -bottom-1 w-8 h-1 bg-white rounded-full"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
               </Link>
             );
           })}
