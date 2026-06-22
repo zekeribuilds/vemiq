@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const protectedRoutes = ["/dashboard"];
+
 const publicRoutes = [
   "/",
   "/login",
@@ -11,7 +12,7 @@ const publicRoutes = [
   "/auth/callback",
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isProtected = protectedRoutes.some((route) =>
