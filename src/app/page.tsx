@@ -21,9 +21,9 @@ export default function Home() {
 
         <div className="relative">
           <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
-            <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-xl md:text-3xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
               Document Your SIWES Today<br />
-              <span className="text-2xl sm:text-xl md:text-2xl lg:text-4xl text-primary block mt-0">Generate Your Report Tomorrow</span>
+              <span className="text-2xl sm:text-lg md:text-2xl lg:text-4xl block mt-0" style={{ color: '#8661ff' }}>Generate Your Report Tomorrow</span>
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-foreground max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
               Vemiq helps students capture activities, store evidence, and organize training records throughout their industrial attachment, making report writing a structured process instead of a last-minute rush.
