@@ -16,3 +16,6 @@ export * from './icons';
 
 // Components
 export * from './components';
+
+// Layouts
+export * from './layouts';

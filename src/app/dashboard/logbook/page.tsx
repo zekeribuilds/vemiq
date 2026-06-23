@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/browser';
-import PageContainer from '@/components/layout/PageContainer';
-import { SearchIcon, FilterIcon, CreateIcon, DocumentsIcon, MicIcon, CameraIcon, UploadIcon, ChevronRightIcon, XIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { EmptyState } from '@/design-system/components/EmptyState';
+import { Container, Stack } from '@/design-system/layouts';
+import { colors, spacing } from '@/design-system/tokens/index';
 
 export default function DashboardLogbookPage() {
   const router = useRouter();
@@ -26,20 +27,20 @@ export default function DashboardLogbookPage() {
   ];
 
   const fabActions = [
-    { icon: DocumentsIcon, label: 'Type Entry', color: 'text-[#22C55E]', action: () => {} },
-    { icon: MicIcon, label: 'Record Audio', color: 'text-[#F59E0B]', action: () => {} },
-    { icon: CameraIcon, label: 'Take Picture', color: 'text-[#8B5CF6]', action: () => {} },
-    { icon: UploadIcon, label: 'Upload Image', color: 'text-[#3B82F6]', action: () => {} },
+    { iconKey: 'file', label: 'Type Entry', color: colors.success, action: () => {} },
+    { iconKey: 'mic', label: 'Record Audio', color: colors.warning, action: () => {} },
+    { iconKey: 'image', label: 'Take Picture', color: colors.purple, action: () => {} },
+    { iconKey: 'uploads', label: 'Upload Image', color: colors.info, action: () => {} },
   ];
 
   const getEntryIcon = (type: string) => {
     switch (type) {
       case 'voice':
-        return <MicIcon size={20} className="text-[#F59E0B]" />;
+        return <div style={{ color: colors.warning }}><VemiqIcon category="content" name="voice" size={20} /></div>;
       case 'image':
-        return <CameraIcon size={20} className="text-[#8B5CF6]" />;
+        return <div style={{ color: colors.purple }}><VemiqIcon category="content" name="image" size={20} /></div>;
       default:
-        return <DocumentsIcon size={20} className="text-[#22C55E]" />;
+        return <div style={{ color: colors.success }}><VemiqIcon category="content" name="file" size={20} /></div>;
     }
   };
 
@@ -78,20 +79,35 @@ export default function DashboardLogbookPage() {
 
   if (loading) {
     return (
-      <PageContainer>
-        <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+      <Container size="lg">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '256px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: `4px solid ${colors.primary}`,
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }} />
         </div>
-      </PageContainer>
+      </Container>
     );
   }
 
   if (error) {
     return (
-      <PageContainer>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-muted-foreground mb-4">Failed to load entries</p>
+      <Container size="lg">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '256px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '16px',
+              fontWeight: '400',
+              color: colors.text.secondary,
+              marginBottom: spacing.md,
+            }}>
+              Failed to load entries
+            </p>
             <Button
               onClick={() => window.location.reload()}
               size="md"
@@ -101,39 +117,57 @@ export default function DashboardLogbookPage() {
             </Button>
           </div>
         </div>
-      </PageContainer>
+      </Container>
     );
   }
 
   return (
-    <PageContainer>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary mb-2">Logbook</h1>
-        <p className="text-muted-foreground">Document your daily activities and experiences</p>
+    <Container size="lg">
+      <div style={{ marginBottom: spacing.xl }}>
+        <h1 style={{
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: '30px',
+          fontWeight: '700',
+          color: colors.primary,
+          marginBottom: spacing.sm,
+        }}>
+          Logbook
+        </h1>
+        <p style={{
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: '16px',
+          fontWeight: '400',
+          color: colors.text.secondary,
+        }}>
+          Document your daily activities and experiences
+        </p>
       </div>
 
-      <div className="flex items-center justify-between mb-6">
-        <div className="relative w-96">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.lg }}>
+        <div style={{ position: 'relative', width: '384px' }}>
+          <div style={{ position: 'absolute', left: spacing.sm, top: '50%', transform: 'translateY(-50%)', color: colors.text.secondary }}>
+            <VemiqIcon category="action" name="search" size={20} />
+          </div>
           <Input
             type="text"
             placeholder="Search entries..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10"
+            style={{ width: '100%', paddingLeft: spacing.xl }}
           />
         </div>
         <Button
           onClick={() => setShowFabMenu(!showFabMenu)}
           size="md"
           variant="primary"
-          leftIcon={<CreateIcon size={20} />}
+          icon="create"
+          iconPosition="left"
         >
           Add Entry
         </Button>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      <div style={{ display: 'flex', gap: spacing.sm, marginBottom: spacing.lg }}>
         {filters.map((filter) => (
           <Button
             key={filter.id}
@@ -147,47 +181,88 @@ export default function DashboardLogbookPage() {
       </div>
 
       {filteredEntries.length === 0 ? (
-        <div className="text-center py-12 bg-card border border-border rounded-24">
-          <DocumentsIcon size={48} className="text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground mb-4">
-            {searchQuery || activeFilter !== 'all' ? 'No entries match your search' : 'No entries yet'}
-          </p>
-          {!searchQuery && activeFilter === 'all' && (
-            <Button
-              onClick={() => setShowFabMenu(!showFabMenu)}
-              size="md"
-              variant="primary"
-            >
-              Add Your First Entry
-            </Button>
-          )}
-        </div>
+        <EmptyState
+          icon="no_logbook"
+          title={searchQuery || activeFilter !== 'all' ? 'No entries match your search' : 'No entries yet'}
+          description={searchQuery || activeFilter !== 'all' ? 'Try a different search term or filter' : 'Add your first logbook entry to get started'}
+          actionLabel={!searchQuery && activeFilter === 'all' ? 'Add Your First Entry' : undefined}
+          onAction={!searchQuery && activeFilter === 'all' ? () => setShowFabMenu(!showFabMenu) : undefined}
+        />
       ) : (
-        <div className="space-y-4">
+        <Stack spacing="md">
           {filteredEntries.map((entry) => (
             <div
               key={entry.id}
-              className="card p-6 flex items-start gap-4 cursor-pointer hover:border-accent transition-colors"
+              style={{
+                padding: spacing.lg,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: spacing.md,
+                cursor: 'pointer',
+                backgroundColor: colors.background.surface,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '12px',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = colors.primary;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = colors.border;
+              }}
             >
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+              <div style={{
+                flexShrink: 0,
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: colors.background.elevated,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
                 {getEntryIcon(entry.entry_type)}
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-foreground mb-1">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{
+                  fontFamily: 'system-ui, sans-serif',
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: colors.text.primary,
+                  marginBottom: spacing.xs,
+                }}>
                   {entry.title || 'Untitled Entry'}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p style={{
+                  fontFamily: 'system-ui, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  color: colors.text.secondary,
+                  marginBottom: spacing.sm,
+                }}>
                   {new Date(entry.created_at).toLocaleDateString()}
                 </p>
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p style={{
+                  fontFamily: 'system-ui, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  color: colors.text.secondary,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                }}>
                   {entry.content?.substring(0, 150) || 'No content'}
                 </p>
               </div>
-              <ChevronRightIcon size={20} className="text-muted-foreground flex-shrink-0 mt-1" />
+              <div style={{ color: colors.text.secondary, flexShrink: 0, marginTop: spacing.xs }}>
+                <VemiqIcon category="action" name="add" size={20} />
+              </div>
             </div>
           ))}
-        </div>
+        </Stack>
       )}
-    </PageContainer>
+    </Container>
   );
 }

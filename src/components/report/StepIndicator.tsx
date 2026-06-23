@@ -1,5 +1,6 @@
-import { CheckIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { reportWorkflowSteps } from '@/lib/report-workflow';
+import { colors, spacing } from '@/design-system/tokens/index';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -8,31 +9,51 @@ interface StepIndicatorProps {
 
 export default function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   return (
-    <div className="w-full mb-8">
-      <div className="flex items-center justify-between">
+    <div style={{ width: '100%', marginBottom: spacing.xl }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {reportWorkflowSteps.slice(0, totalSteps).map((step, index) => {
           const stepNumber = step.id;
           const isCompleted = stepNumber < currentStep;
           const isCurrent = stepNumber === currentStep;
           
           return (
-            <div key={step.id} className="flex items-center flex-1">
-              <div className="flex flex-col items-center">
+            <div key={step.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div
-                  className={`w-12 h-12 rounded-md flex items-center justify-center font-semibold transition-all duration-300 ${
-                    isCompleted
-                      ? 'bg-[#22C55E] text-white shadow-sm'
-                      : isCurrent
-                      ? 'bg-[#22C55E] text-white shadow-sm scale-110'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'system-ui, sans-serif',
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: isCompleted || isCurrent ? colors.success : colors.background.elevated,
+                    color: isCompleted || isCurrent ? colors.text.primary : colors.text.muted,
+                    boxShadow: isCompleted || isCurrent ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                    transform: isCurrent ? 'scale(1.1)' : 'scale(1)',
+                  }}
                 >
-                  {isCompleted ? <CheckIcon size={20} /> : stepNumber}
+                  {isCompleted ? (
+                    <div style={{ color: colors.text.primary }}>
+                      <VemiqIcon category="status" name="completed" size={20} />
+                    </div>
+                  ) : (
+                    stepNumber
+                  )}
                 </div>
                 <span
-                  className={`text-xs mt-2 text-center font-medium transition-colors ${
-                    isCurrent ? 'text-primary' : 'text-muted-foreground'
-                  }`}
+                  style={{
+                    fontFamily: 'system-ui, sans-serif',
+                    fontSize: '12px',
+                    marginTop: spacing.xs,
+                    textAlign: 'center',
+                    fontWeight: '500',
+                    transition: 'color 0.2s ease',
+                    color: isCurrent ? colors.primary : colors.text.muted,
+                  }}
                 >
                   {step.label}
                 </span>
@@ -40,9 +61,14 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
 
               {index < reportWorkflowSteps.slice(0, totalSteps).length - 1 && (
                 <div
-                  className={`flex-1 h-1.5 mx-2 rounded-full transition-all duration-300 ${
-                    isCompleted ? 'bg-[#22C55E]' : 'bg-muted'
-                  }`}
+                  style={{
+                    flex: 1,
+                    height: '6px',
+                    margin: `0 ${spacing.sm}`,
+                    borderRadius: '9999px',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: isCompleted ? colors.success : colors.background.elevated,
+                  }}
                 />
               )}
             </div>

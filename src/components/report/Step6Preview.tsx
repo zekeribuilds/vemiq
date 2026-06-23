@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { EyeIcon, ChevronLeftIcon, ChevronRightIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
+import { Stack } from '@/design-system/layouts';
+import { colors, spacing } from '@/design-system/tokens/index';
 import { useReportStore } from '@/store/reportStore';
 import A4Page from '@/components/preview/A4Page';
 import { calculateTotalPages } from '@/lib/pdf/pageCalculator';
@@ -35,23 +37,29 @@ export default function Step6Preview() {
   });
 
   const renderTitlePage = () => (
-    <div className="flex flex-col items-center justify-center h-full text-center">
-      <h1 className="text-2xl font-bold mb-8">{reportType} REPORT</h1>
-      <h2 className="text-xl mb-4">ON</h2>
-      <h3 className="text-2xl font-bold mb-8">INDUSTRIAL TRAINING</h3>
-      <div className="mt-8 space-y-2">
-        <p className="font-semibold">AT</p>
-        <p className="text-lg">{studentInfo.companyName}</p>
-        <p className="text-sm">{studentInfo.organizationDepartment}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
+      <h1 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '24px', fontWeight: '700', marginBottom: spacing.xl }}>{reportType} REPORT</h1>
+      <h2 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '20px', marginBottom: spacing.md }}>ON</h2>
+      <h3 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '24px', fontWeight: '700', marginBottom: spacing.xl }}>INDUSTRIAL TRAINING</h3>
+      <div style={{ marginTop: spacing.xl }}>
+        <Stack spacing="sm">
+          <p style={{ fontFamily: 'system-ui, sans-serif', fontWeight: '600' }}>AT</p>
+          <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '18px' }}>{studentInfo.companyName}</p>
+          <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>{studentInfo.organizationDepartment}</p>
+        </Stack>
       </div>
-      <div className="mt-8 space-y-2">
-        <p className="font-semibold">ACADEMIC SESSION</p>
-        <p>{studentInfo.academicSession}</p>
+      <div style={{ marginTop: spacing.xl }}>
+        <Stack spacing="sm">
+          <p style={{ fontFamily: 'system-ui, sans-serif', fontWeight: '600' }}>ACADEMIC SESSION</p>
+          <p style={{ fontFamily: 'system-ui, sans-serif' }}>{studentInfo.academicSession}</p>
+        </Stack>
       </div>
-      <div className="mt-8 space-y-2">
-        <p className="font-semibold">IN PARTIAL FULFILLMENT OF</p>
-        <p>THE REQUIREMENTS FOR THE AWARD OF</p>
-        <p>BACHELOR OF ENGINEERING (B.Eng)</p>
+      <div style={{ marginTop: spacing.xl }}>
+        <Stack spacing="sm">
+          <p style={{ fontFamily: 'system-ui, sans-serif', fontWeight: '600' }}>IN PARTIAL FULFILLMENT OF</p>
+          <p style={{ fontFamily: 'system-ui, sans-serif' }}>THE REQUIREMENTS FOR THE AWARD OF</p>
+          <p style={{ fontFamily: 'system-ui, sans-serif' }}>BACHELOR OF ENGINEERING (B.Eng)</p>
+        </Stack>
       </div>
     </div>
   );
@@ -63,27 +71,29 @@ export default function Step6Preview() {
       case 2:
         return (
           <div>
-            <h2 className="text-xl font-bold mb-4">CERTIFICATION</h2>
-            <p className="mb-4">
+            <h2 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '20px', fontWeight: '700', marginBottom: spacing.md }}>CERTIFICATION</h2>
+            <p style={{ fontFamily: 'system-ui, sans-serif', marginBottom: spacing.md }}>
               This is to certify that this {reportType} report titled
               &quot;INDUSTRIAL TRAINING REPORT&quot; was carried out at
               {studentInfo.companyName}, {studentInfo.organizationDepartment}
               under my supervision.
             </p>
-            <div className="mt-12 space-y-4">
-              <p>______________________</p>
-              <p>Supervisor: {studentInfo.supervisorName}</p>
-              <p>______________________</p>
-              <p>Coordinator: {studentInfo.coordinatorName}</p>
+            <div style={{ marginTop: spacing['3xl'] }}>
+              <Stack spacing="md">
+                <p>______________________</p>
+                <p style={{ fontFamily: 'system-ui, sans-serif' }}>Supervisor: {studentInfo.supervisorName}</p>
+                <p>______________________</p>
+                <p style={{ fontFamily: 'system-ui, sans-serif' }}>Coordinator: {studentInfo.coordinatorName}</p>
+              </Stack>
             </div>
           </div>
         );
       case 3:
         return (
           <div>
-            <h2 className="text-xl font-bold mb-4">DEDICATION</h2>
+            <h2 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '20px', fontWeight: '700', marginBottom: spacing.md }}>DEDICATION</h2>
             {reportStructure.includeDedication && (
-              <p>
+              <p style={{ fontFamily: 'system-ui, sans-serif' }}>
                 This report is dedicated to my parents, guardians, and all who
                 have supported me throughout my academic journey.
               </p>
@@ -93,9 +103,9 @@ export default function Step6Preview() {
       case 4:
         return (
           <div>
-            <h2 className="text-xl font-bold mb-4">ACKNOWLEDGEMENT</h2>
+            <h2 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '20px', fontWeight: '700', marginBottom: spacing.md }}>ACKNOWLEDGEMENT</h2>
             {reportStructure.includeAcknowledgement && (
-              <p>
+              <p style={{ fontFamily: 'system-ui, sans-serif' }}>
                 I wish to express my sincere gratitude to my supervisor,
                 {studentInfo.supervisorName}, for his guidance and support
                 throughout this industrial training program. I also thank the
@@ -108,9 +118,9 @@ export default function Step6Preview() {
       case 5:
         return (
           <div>
-            <h2 className="text-xl font-bold mb-4">ABSTRACT</h2>
+            <h2 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '20px', fontWeight: '700', marginBottom: spacing.md }}>ABSTRACT</h2>
             {reportStructure.includeAbstract && (
-              <p>
+              <p style={{ fontFamily: 'system-ui, sans-serif' }}>
                 This report details my industrial training experience at
                 {studentInfo.companyName}, {studentInfo.organizationDepartment}
                 during the {studentInfo.academicSession} academic session
@@ -123,50 +133,83 @@ export default function Step6Preview() {
           </div>
         );
       default:
-        return <p>Content for page {currentPage}</p>;
+        return <p style={{ fontFamily: 'system-ui, sans-serif' }}>Content for page {currentPage}</p>;
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold text-foreground mb-4">Preview Your Report</h2>
-      <p className="text-muted-foreground mb-8">
+    <div style={{ maxWidth: '56rem', margin: '0 auto' }}>
+      <h2 style={{
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '24px',
+        fontWeight: '700',
+        color: colors.text.primary,
+        marginBottom: spacing.md,
+      }}>
+        Preview Your Report
+      </h2>
+      <p style={{
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '16px',
+        color: colors.text.secondary,
+        marginBottom: spacing.xl,
+      }}>
         Review your report before exporting to PDF.
       </p>
 
-      <div className="bg-muted rounded-3xl p-8 mb-6">
-        <Card className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+      <div style={{
+        backgroundColor: colors.background.elevated,
+        borderRadius: '24px',
+        padding: spacing.xl,
+        marginBottom: spacing.xl,
+      }}>
+        <Card style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
             <Button
               onClick={() => setZoom(Math.max(50, zoom - 25))}
               variant="ghost"
               size="sm"
-              leftIcon={<ChevronLeftIcon size={20} />}
+              icon="remove"
+              iconPosition="left"
             >
               Zoom Out
             </Button>
-            <span className="text-sm font-medium text-foreground">{zoom}%</span>
+            <span style={{
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: colors.text.primary,
+            }}>
+              {zoom}%
+            </span>
             <Button
               onClick={() => setZoom(Math.min(200, zoom + 25))}
               variant="ghost"
               size="sm"
-              leftIcon={<ChevronRightIcon size={20} />}
+              icon="add"
+              iconPosition="left"
             >
               Zoom In
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
             <Button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage <= 1}
               variant="ghost"
               size="sm"
-              leftIcon={<ChevronLeftIcon size={20} />}
+              icon="remove"
+              iconPosition="left"
             >
               Previous
             </Button>
-            <span className="text-sm font-medium text-foreground">
+            <span style={{
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: colors.text.primary,
+            }}>
               Page {currentPage} of {totalPages}
             </span>
             <Button
@@ -174,7 +217,8 @@ export default function Step6Preview() {
               disabled={currentPage >= totalPages}
               variant="ghost"
               size="sm"
-              leftIcon={<ChevronRightIcon size={20} />}
+              icon="add"
+              iconPosition="left"
             >
               Next
             </Button>
@@ -182,8 +226,12 @@ export default function Step6Preview() {
         </Card>
 
         <div
-          className="flex justify-center transition-transform"
-          style={{ transform: `scale(${zoom / 100})` }}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            transition: 'transform 0.2s ease',
+            transform: `scale(${zoom / 100})`,
+          }}
         >
           <A4Page pageNumber={currentPage} totalPages={totalPages}>
             {renderContent()}
@@ -191,7 +239,7 @@ export default function Step6Preview() {
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Button onClick={() => setStep(5)} variant="ghost" size="md">
           Back
         </Button>

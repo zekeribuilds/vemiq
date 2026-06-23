@@ -1,29 +1,27 @@
-import { DashboardIcon, ReportsIcon, LogbookIcon, ChatIcon, ProfileIcon } from '@/design-system';
-
 export const navigationItems = [
   {
     label: 'Home',
     href: '/dashboard',
-    icon: DashboardIcon,
+    iconKey: 'dashboard',
   },
   {
     label: 'Reports',
     href: '/dashboard/reports',
-    icon: ReportsIcon,
+    iconKey: 'reports',
   },
   {
     label: 'Logbook',
     href: '/dashboard/logbook',
-    icon: LogbookIcon,
+    iconKey: 'logbook',
   },
   {
     label: 'Chat',
     href: '/dashboard/chat',
-    icon: ChatIcon,
+    iconKey: 'chat',
   },
   {
     label: 'Profile',
     href: '/dashboard/profile',
-    icon: ProfileIcon,
+    iconKey: 'profile',
   },
 ];

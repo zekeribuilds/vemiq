@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateIcon, DeleteIcon, SaveIcon, ImagesIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { Textarea } from '@/design-system/components/Textarea';
 import { Card } from '@/design-system/components/Card';
+import { Stack } from '@/design-system/layouts';
+import { colors, spacing } from '@/design-system/tokens/index';
 import { useReportStore } from '@/store/reportStore';
 import ImageUpload from './ImageUpload';
 
@@ -46,14 +48,37 @@ export default function Step4WeeklyLogs() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold text-foreground mb-4">Weekly Logs</h2>
-      <p className="text-muted-foreground mb-8">Add your weekly activities, descriptions, and supporting images during industrial training.</p>
+    <div style={{ maxWidth: '56rem', margin: '0 auto' }}>
+      <h2 style={{
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '24px',
+        fontWeight: '700',
+        color: colors.text.primary,
+        marginBottom: spacing.md,
+      }}>
+        Weekly Logs
+      </h2>
+      <p style={{
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '16px',
+        color: colors.text.secondary,
+        marginBottom: spacing.xl,
+      }}>
+        Add your weekly activities, descriptions, and supporting images during industrial training.
+      </p>
 
-      <Card className="mb-8 p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Add Week {currentWeek}</h3>
+      <Card style={{ marginBottom: spacing.xl, padding: spacing.xl }}>
+        <h3 style={{
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: '18px',
+          fontWeight: '600',
+          color: colors.text.primary,
+          marginBottom: spacing.lg,
+        }}>
+          Add Week {currentWeek}
+        </h3>
 
-        <div className="space-y-4">
+        <Stack spacing="lg">
           <Input
             type="text"
             label="Week Title"
@@ -72,7 +97,14 @@ export default function Step4WeeklyLogs() {
           />
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label style={{
+              display: 'block',
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: colors.text.primary,
+              marginBottom: spacing.sm,
+            }}>
               Images (Optional)
             </label>
             <ImageUpload onImagesChange={setImages} />
@@ -82,51 +114,85 @@ export default function Step4WeeklyLogs() {
             type="button"
             onClick={handleAddLog}
             disabled={!title.trim() || !description.trim()}
-            leftIcon={<CreateIcon size={20} />}
+            icon="add"
+            iconPosition="left"
             size="md"
           >
             Add Week
           </Button>
-        </div>
+        </Stack>
       </Card>
 
       {weeklyLogs.length > 0 && (
-        <div className="space-y-4 mb-8">
-          <h3 className="text-lg font-semibold text-foreground">Added Weeks</h3>
+        <div style={{ marginBottom: spacing.xl }}>
+          <h3 style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '18px',
+            fontWeight: '600',
+            color: colors.text.primary,
+            marginBottom: spacing.lg,
+          }}>
+            Added Weeks
+          </h3>
 
-          {weeklyLogs.map((log) => (
-            <Card
-              key={log.week}
-              className="p-6"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <h4 className="font-semibold text-foreground">Week {log.week}: {log.title}</h4>
-                <Button
-                  onClick={() => handleDeleteLog(log.week)}
-                  variant="ghost"
-                  size="sm"
-                  leftIcon={<DeleteIcon size={18} />}
-                >
-                  Delete
-                </Button>
-              </div>
-              <p className="text-muted-foreground text-sm mb-3">{log.description}</p>
-              {log.images && log.images.length > 0 && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <ImagesIcon size={16} />
-                  <span>{log.images.length} image{log.images.length > 1 ? 's' : ''} attached</span>
+          <Stack spacing="lg">
+            {weeklyLogs.map((log) => (
+              <Card
+                key={log.week}
+                style={{ padding: spacing.xl }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: spacing.md }}>
+                  <h4 style={{
+                    fontFamily: 'system-ui, sans-serif',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: colors.text.primary,
+                  }}>
+                    Week {log.week}: {log.title}
+                  </h4>
+                  <Button
+                    onClick={() => handleDeleteLog(log.week)}
+                    variant="ghost"
+                    size="sm"
+                    icon="remove"
+                    iconPosition="left"
+                  >
+                    Delete
+                  </Button>
                 </div>
-              )}
-            </Card>
-          ))}
+                <p style={{
+                  fontFamily: 'system-ui, sans-serif',
+                  fontSize: '14px',
+                  color: colors.text.secondary,
+                  marginBottom: spacing.md,
+                }}>
+                  {log.description}
+                </p>
+                {log.images && log.images.length > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+                    <div style={{ color: colors.text.secondary }}>
+                      <VemiqIcon category="content" name="image" size={16} />
+                    </div>
+                    <span style={{
+                      fontFamily: 'system-ui, sans-serif',
+                      fontSize: '14px',
+                      color: colors.text.secondary,
+                    }}>
+                      {log.images.length} image{log.images.length > 1 ? 's' : ''} attached
+                    </span>
+                  </div>
+                )}
+              </Card>
+            ))}
+          </Stack>
         </div>
       )}
 
-      <div className="flex justify-between">
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Button type="button" onClick={() => setStep(3)} variant="ghost" size="md">
           Back
         </Button>
-        <Button onClick={handleSubmit} leftIcon={<SaveIcon size={20} />} size="md">
+        <Button onClick={handleSubmit} icon="save" iconPosition="left" size="md">
           Save & Continue
         </Button>
       </div>

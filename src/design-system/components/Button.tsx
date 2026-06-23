@@ -6,14 +6,15 @@
  */
 
 import React from 'react';
-import { colors, radius, spacing, typography } from '../tokens';
+import { colors, spacing } from '../tokens/index';
+import { VemiqIcon } from '@/components/VemiqIcon';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  icon?: string; // Icon key from registry
+  iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
 }
 
@@ -23,8 +24,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant = 'primary',
       size = 'md',
       isLoading = false,
-      leftIcon,
-      rightIcon,
+      icon,
+      iconPosition = 'left',
       fullWidth = false,
       disabled,
       className = '',
@@ -33,84 +34,59 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyles = {
+    const baseStyles: React.CSSProperties = {
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: spacing[8],
-      fontFamily: typography.fontFamily.sans,
-      fontWeight: typography.fontWeight.medium,
-      borderRadius: radius[8],
+      gap: spacing.sm,
+      fontFamily: 'system-ui, sans-serif',
+      fontWeight: '500',
+      borderRadius: '8px',
       border: 'none',
       cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
       transition: 'all 0.2s ease',
       width: fullWidth ? '100%' : 'auto',
     };
 
-    const sizeStyles = {
+    const sizeStyles: Record<string, React.CSSProperties> = {
       sm: {
-        padding: `${spacing[8]} ${spacing[16]}`,
-        fontSize: typography.fontSize.caption,
+        padding: `${spacing.xs} ${spacing.md}`,
+        fontSize: '12px',
         minHeight: '32px',
       },
       md: {
-        padding: `${spacing[12]} ${spacing[24]}`,
-        fontSize: typography.fontSize.body,
+        padding: `${spacing.sm} ${spacing.lg}`,
+        fontSize: '16px',
         minHeight: '40px',
       },
       lg: {
-        padding: `${spacing[16]} ${spacing[32]}`,
-        fontSize: typography.fontSize.body,
+        padding: `${spacing.md} ${spacing.xl}`,
+        fontSize: '16px',
         minHeight: '48px',
       },
     };
 
-    const variantStyles = {
+    const variantStyles: Record<string, React.CSSProperties> = {
       primary: {
-        backgroundColor: disabled ? colors.text.quaternary : colors.primary.DEFAULT,
+        backgroundColor: disabled ? colors.text.disabled : colors.primary,
         color: colors.text.primary,
-        '&:hover:not(:disabled)': {
-          backgroundColor: colors.primary.hover,
-        },
-        '&:active:not(:disabled)': {
-          backgroundColor: colors.primary.active,
-        },
       },
       secondary: {
         backgroundColor: colors.background.elevated,
         color: colors.text.secondary,
-        border: `1px solid ${colors.border.DEFAULT}`,
-        '&:hover:not(:disabled)': {
-          backgroundColor: colors.background.overlay,
-          borderColor: colors.border.hover,
-        },
-        '&:active:not(:disabled)': {
-          backgroundColor: colors.background.overlay,
-        },
+        border: `1px solid ${colors.border}`,
       },
       ghost: {
         backgroundColor: 'transparent',
         color: colors.text.secondary,
-        '&:hover:not(:disabled)': {
-          backgroundColor: colors.background.elevated,
-        },
-        '&:active:not(:disabled)': {
-          backgroundColor: colors.background.overlay,
-        },
       },
       danger: {
-        backgroundColor: disabled ? colors.text.quaternary : colors.error.DEFAULT,
+        backgroundColor: disabled ? colors.text.disabled : colors.danger,
         color: colors.text.primary,
-        '&:hover:not(:disabled)': {
-          backgroundColor: colors.error.hover,
-        },
-        '&:active:not(:disabled)': {
-          backgroundColor: colors.error.hover,
-        },
       },
     };
 
-    const style = {
+    const style: React.CSSProperties = {
       ...baseStyles,
       ...sizeStyles[size],
       ...variantStyles[variant],
@@ -120,7 +96,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || isLoading}
-        style={style as React.CSSProperties}
+        style={style}
         className={className}
         {...props}
       >
@@ -140,9 +116,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         ) : (
           <>
-            {leftIcon}
+            {icon && iconPosition === 'left' && (
+              <VemiqIcon category="action" name={icon} size={16} />
+            )}
             {children}
-            {rightIcon}
+            {icon && iconPosition === 'right' && (
+              <VemiqIcon category="action" name={icon} size={16} />
+            )}
           </>
         )}
       </button>

@@ -2,10 +2,12 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { LockIcon, ArrowLeftIcon, SparklesIcon, SuccessIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { Card } from '@/design-system/components/Card';
+import { Container, Stack } from '@/design-system/layouts';
+import { colors, spacing } from '@/design-system/tokens/index';
 import { createClient } from '@/lib/supabase/browser';
 
 function ResetPasswordForm() {
@@ -74,94 +76,161 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="max-w-md w-full relative animate-fade-in-up">
-        <div className="mb-8">
-          <a href="/login" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">
-            <ArrowLeftIcon size={20} />
+    <div style={{ minHeight: '100vh', backgroundColor: colors.background.base, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: spacing.md, position: 'relative', overflow: 'hidden' }}>
+      <Container size="sm">
+        <div style={{ marginBottom: spacing.xl }}>
+          <a href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary, textDecoration: 'none', transition: 'color 0.2s' }}>
+            <div style={{ color: colors.text.secondary }}>
+              <VemiqIcon category="action" name="close" size={20} />
+            </div>
             Back to login
           </a>
         </div>
 
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-            <SparklesIcon size={16} />
+        <div style={{ textAlign: 'center', marginBottom: spacing.xl }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: spacing.sm,
+            padding: `${spacing.sm} ${spacing.md}`,
+            backgroundColor: `${colors.primary}1A`,
+            color: colors.primary,
+            borderRadius: '9999px',
+            fontSize: '14px',
+            fontWeight: '500',
+            marginBottom: spacing.lg,
+          }}>
+            <div style={{ color: colors.primary }}>
+              <VemiqIcon category="status" name="sparkles" size={16} />
+            </div>
             <span>New Password</span>
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Set New Password</h1>
-          <p className="text-muted-foreground">
+          <h1 style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '36px',
+            fontWeight: '700',
+            color: colors.text.primary,
+            marginBottom: spacing.sm,
+          }}>
+            Set New Password
+          </h1>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '16px',
+            color: colors.text.secondary,
+          }}>
             {isSuccess
               ? 'Password updated successfully'
               : 'Enter your new password below'}
           </p>
         </div>
 
-        <Card className="p-8 animate-scale-in" style={{ animationDelay: '0.1s' }}>
+        <Card style={{ padding: spacing.xl }}>
           {isSuccess ? (
-            <div className="text-center py-8">
-              <div className="w-20 h-20 bg-[#22C55E] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <SuccessIcon className="text-white" size={36} />
+            <div style={{ textAlign: 'center', padding: `${spacing.xl} 0` }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                backgroundColor: colors.success,
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto',
+                marginBottom: spacing.lg,
+              }}>
+                <div style={{ color: colors.text.primary }}>
+                  <VemiqIcon category="status" name="success" size={36} />
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <h3 style={{
+                fontFamily: 'system-ui, sans-serif',
+                fontSize: '20px',
+                fontWeight: '600',
+                color: colors.text.primary,
+                marginBottom: spacing.sm,
+              }}>
                 Password Updated!
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p style={{
+                fontFamily: 'system-ui, sans-serif',
+                fontSize: '16px',
+                color: colors.text.secondary,
+                marginBottom: spacing.lg,
+              }}>
                 Redirecting to login...
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <Input
-                type="password"
-                label="New Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                fullWidth
-                leftIcon={<LockIcon size={20} />}
-              />
-              <p className="text-xs text-muted-foreground">Must be at least 6 characters</p>
-
-              <Input
-                type="password"
-                label="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                fullWidth
-                leftIcon={<LockIcon size={20} />}
-              />
-
-              {error && (
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm animate-fade-in">
-                  {error}
+            <form onSubmit={handleSubmit}>
+              <Stack spacing="lg">
+                <div>
+                  <Input
+                    type="password"
+                    label="New Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    fullWidth
+                  />
+                  <p style={{
+                    fontFamily: 'system-ui, sans-serif',
+                    fontSize: '12px',
+                    color: colors.text.secondary,
+                    marginTop: spacing.xs,
+                  }}>
+                    Must be at least 6 characters
+                  </p>
                 </div>
-              )}
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                isLoading={isLoading}
-                fullWidth
-                size="md"
-              >
-                Update Password
-              </Button>
+                <Input
+                  type="password"
+                  label="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  fullWidth
+                />
+
+                {error && (
+                  <div style={{
+                    padding: spacing.md,
+                    backgroundColor: `${colors.danger}1A`,
+                    border: `1px solid ${colors.danger}33`,
+                    borderRadius: '8px',
+                    color: colors.danger,
+                    fontSize: '14px',
+                    fontFamily: 'system-ui, sans-serif',
+                  }}>
+                    {error}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  isLoading={isLoading}
+                  fullWidth
+                  size="md"
+                >
+                  Update Password
+                </Button>
+              </Stack>
             </form>
           )}
         </Card>
-      </div>
+      </Container>
     </div>
   );
 }
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: colors.background.base, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
       <ResetPasswordForm />
     </Suspense>
   );

@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/browser';
-import { CreateIcon, SearchIcon, EditIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { EmptyState } from '@/design-system/components/EmptyState';
+import { Container, Stack, Grid } from '@/design-system/layouts';
+import { colors, spacing } from '@/design-system/tokens/index';
 import ReportCard from '@/components/dashboard/ReportCard';
-import PageContainer from '@/components/layout/PageContainer';
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -42,58 +43,110 @@ export default function ReportsPage() {
   );
 
   return (
-    <PageContainer>
-      <div className="flex items-center justify-between mb-8">
+    <Container size="lg">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xl }}>
         <div>
-          <h1 className="text-3xl font-bold text-primary mb-2">Reports</h1>
-          <p className="text-muted-foreground">Manage your industrial training reports.</p>
+          <h1 style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '30px',
+            fontWeight: '700',
+            color: colors.primary,
+            marginBottom: spacing.sm,
+          }}>
+            Reports
+          </h1>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '16px',
+            fontWeight: '400',
+            color: colors.text.secondary,
+          }}>
+            Manage your industrial training reports.
+          </p>
         </div>
         <Link
           href="/dashboard/reports/create"
-          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-16 hover:bg-accent-dark transition-colors"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing.sm,
+            padding: `${spacing.sm} ${spacing.md}`,
+            backgroundColor: colors.primary,
+            color: colors.text.primary,
+            borderRadius: '16px',
+            textDecoration: 'none',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = `${colors.primary}CC`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = colors.primary;
+          }}
         >
-          <CreateIcon size={20} />
+          <div style={{ color: colors.text.primary }}>
+            <VemiqIcon category="action" name="create" size={20} />
+          </div>
           Create Report
         </Link>
       </div>
 
-      <div className="flex items-center gap-4 mb-6">
-        <div className="relative w-96">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.lg }}>
+        <div style={{ position: 'relative', width: '384px' }}>
+          <div style={{ position: 'absolute', left: spacing.sm, top: '50%', transform: 'translateY(-50%)', color: colors.text.secondary }}>
+            <VemiqIcon category="action" name="search" size={20} />
+          </div>
           <Input
             type="text"
             placeholder="Search reports..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10"
+            style={{ width: '100%', paddingLeft: spacing.xl }}
           />
         </div>
         <Button
           variant="ghost"
           size="md"
-          leftIcon={<EditIcon size={20} />}
+          icon="edit"
+          iconPosition="left"
         >
           Filter
         </Button>
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading reports...</p>
+        <div style={{ textAlign: 'center', padding: spacing['3xl'] }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: `4px solid ${colors.primary}`,
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto',
+            marginBottom: spacing.md,
+          }} />
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '16px',
+            fontWeight: '400',
+            color: colors.text.secondary,
+          }}>
+            Loading reports...
+          </p>
         </div>
       ) : filteredReports.length === 0 ? (
         <EmptyState
-          icon={<CreateIcon size={32} />}
+          icon="no_reports"
           title={searchQuery ? 'No reports match your search' : 'No reports yet'}
           description={searchQuery ? 'Try a different search term' : 'Create your first report to get started'}
           actionLabel={!searchQuery ? 'Create Report' : undefined}
           onAction={!searchQuery ? () => router.push('/dashboard/reports/create') : undefined}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Grid columns={3} gap="lg">
           {filteredReports.map((report) => (
-            <Link key={report.id} href={`/dashboard/reports/${report.id}`}>
+            <Link key={report.id} href={`/dashboard/reports/${report.id}`} style={{ textDecoration: 'none' }}>
               <ReportCard
                 title={report.title}
                 type={report.report_type}
@@ -102,8 +155,8 @@ export default function ReportsPage() {
               />
             </Link>
           ))}
-        </div>
+        </Grid>
       )}
-    </PageContainer>
+    </Container>
   );
 }

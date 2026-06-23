@@ -1,8 +1,9 @@
 'use client';
 
-import { LogbookIcon, ReportsIcon, ChatIcon, UploadsIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
+import { colors, spacing } from '@/design-system/tokens/index';
 
 interface QuickActionsCardProps {
   onAddLogbook: () => void;
@@ -19,63 +20,90 @@ export default function QuickActionsCard({
 }: QuickActionsCardProps) {
   const actions = [
     {
-      icon: LogbookIcon,
+      iconKey: 'logbook',
       label: 'Add Logbook Entry',
       description: 'Document your daily activities',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
       onClick: onAddLogbook,
     },
     {
-      icon: ReportsIcon,
+      iconKey: 'reports',
       label: 'Continue Report',
       description: 'Work on your active report',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
       onClick: onContinueReport,
     },
     {
-      icon: ChatIcon,
+      iconKey: 'chat',
       label: 'Open AI Chat',
       description: 'Get help with your report',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
       onClick: onOpenAI,
     },
     {
-      icon: UploadsIcon,
+      iconKey: 'uploads',
       label: 'Upload Images',
       description: 'Add photos to logbook',
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
       onClick: onUploadImages,
     },
   ];
 
   return (
-    <Card className="rounded-2xl p-6">
-      <h3 className="text-base font-semibold text-foreground mb-4">What should I do next?</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {actions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Button
-              key={action.label}
-              onClick={action.onClick}
-              variant="ghost"
-              size="md"
-              className="flex-col gap-2 p-4 h-auto"
-              leftIcon={
-                <div className={`w-10 h-10 rounded-full ${action.bgColor} flex items-center justify-center`}>
-                  <Icon size={20} className={action.color} />
-                </div>
-              }
-            >
-              <span className="text-sm font-medium text-foreground">{action.label}</span>
-              <span className="text-xs text-muted-foreground text-center">{action.description}</span>
-            </Button>
-          );
-        })}
+    <Card style={{ padding: spacing.lg }}>
+      <h3 style={{
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '16px',
+        fontWeight: '600',
+        color: colors.text.primary,
+        marginBottom: spacing.md,
+      }}>
+        What should I do next?
+      </h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: spacing.sm }}>
+        {actions.map((action) => (
+          <Button
+            key={action.label}
+            onClick={action.onClick}
+            variant="ghost"
+            size="md"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: spacing.sm,
+              padding: spacing.md,
+              height: 'auto',
+              minHeight: 'auto',
+            }}
+          >
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: `${colors.primary}1A`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <div style={{ color: colors.primary }}>
+                <VemiqIcon category="nav" name={action.iconKey} size={20} />
+              </div>
+            </div>
+            <span style={{
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: colors.text.primary,
+            }}>
+              {action.label}
+            </span>
+            <span style={{
+              fontFamily: 'system-ui, sans-serif',
+              fontSize: '12px',
+              fontWeight: '400',
+              color: colors.text.secondary,
+              textAlign: 'center',
+            }}>
+              {action.description}
+            </span>
+          </Button>
+        ))}
       </div>
     </Card>
   );

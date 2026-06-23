@@ -7,6 +7,7 @@ import { Card } from '@/design-system/components/Card';
 import { Input } from '@/design-system/components/Input';
 import { createClient } from '@/lib/supabase/browser';
 import { trackEvent } from '@/lib/analytics';
+import { colors } from '@/design-system/tokens/index';
 
 export function FeedbackButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -90,8 +91,8 @@ export function FeedbackButton() {
 
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-[#22C55E] rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div style={{ width: '64px', height: '64px', backgroundColor: colors.success, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
+              <svg style={{ width: '32px', height: '32px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>

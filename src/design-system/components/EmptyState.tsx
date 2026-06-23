@@ -11,10 +11,11 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { colors, spacing, typography } from '../tokens';
+import { colors, spacing } from '../tokens/index';
+import { VemiqIcon } from '@/components/VemiqIcon';
 
 export interface EmptyStateProps {
-  icon?: React.ReactNode;
+  icon?: string; // Icon key from EMPTY_ICONS registry
   title: string;
   description: string;
   actionLabel?: string;
@@ -25,19 +26,17 @@ export interface EmptyStateProps {
 
 export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
   ({ icon, title, description, actionLabel, onAction, className = '', style, ...props }, ref) => {
-    console.log('[EMPTY_STATE] Rendering EmptyState with title:', title);
-    
     const containerStyles: React.CSSProperties = {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       textAlign: 'center',
-      padding: spacing[32],
-      gap: spacing[16],
+      padding: spacing.xl,
+      gap: spacing.md,
       backgroundColor: colors.background.surface,
-      border: `1px solid ${colors.border.DEFAULT}`,
-      borderRadius: spacing[16],
+      border: `1px solid ${colors.border}`,
+      borderRadius: '16px',
       ...style,
     };
 
@@ -49,62 +48,65 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: spacing[16],
+      marginBottom: spacing.md,
     };
 
     const iconStyles: React.CSSProperties = {
-      color: colors.text.quaternary,
+      color: colors.text.muted,
     };
 
     const titleStyles: React.CSSProperties = {
-      fontFamily: typography.fontFamily.sans,
-      fontSize: typography.fontSize.h3,
-      fontWeight: typography.fontWeight.semibold,
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: '20px',
+      fontWeight: '600',
       color: colors.text.primary,
-      marginBottom: spacing[8],
+      marginBottom: spacing.xs,
     };
 
     const descriptionStyles: React.CSSProperties = {
-      fontFamily: typography.fontFamily.sans,
-      fontSize: typography.fontSize.body,
-      fontWeight: typography.fontWeight.regular,
-      color: colors.text.tertiary,
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: '16px',
+      fontWeight: '400',
+      color: colors.text.muted,
       maxWidth: '400px',
-      lineHeight: typography.lineHeight.relaxed,
-      marginBottom: spacing[24],
+      lineHeight: '1.5',
+      marginBottom: spacing.lg,
     };
-    
+
+    const buttonStyles: React.CSSProperties = {
+      padding: `${spacing.sm} ${spacing.lg}`,
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: '16px',
+      fontWeight: '500',
+      color: colors.text.primary,
+      backgroundColor: colors.primary,
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    };
+
     if (typeof motion === 'undefined') {
-      console.error('[EMPTY_STATE] motion is undefined - framer-motion not loaded correctly');
       return (
         <div ref={ref} className={className} style={containerStyles} {...props}>
           {icon && (
             <div style={iconContainerStyles}>
-              <div style={iconStyles}>{icon}</div>
+              <div style={iconStyles}>
+                <VemiqIcon category="empty" name={icon} size={32} />
+              </div>
             </div>
           )}
           <div style={titleStyles}>{title}</div>
           <div style={descriptionStyles}>{description}</div>
           {actionLabel && onAction && (
             <button
-              style={{
-                padding: `${spacing[12]} ${spacing[24]}`,
-                fontFamily: typography.fontFamily.sans,
-                fontSize: typography.fontSize.body,
-                fontWeight: typography.fontWeight.medium,
-                color: colors.text.primary,
-                backgroundColor: colors.primary.DEFAULT,
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
+              style={buttonStyles}
               onClick={onAction}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.primary.hover;
+                e.currentTarget.style.backgroundColor = `${colors.primary}CC`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = colors.primary.DEFAULT;
+                e.currentTarget.style.backgroundColor = colors.primary;
               }}
             >
               {actionLabel}
@@ -126,31 +128,22 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       >
         {icon && (
           <div style={iconContainerStyles}>
-            <div style={iconStyles}>{icon}</div>
+            <div style={iconStyles}>
+              <VemiqIcon category="empty" name={icon} size={32} />
+            </div>
           </div>
         )}
         <div style={titleStyles}>{title}</div>
         <div style={descriptionStyles}>{description}</div>
         {actionLabel && onAction && (
           <button
-            style={{
-              padding: `${spacing[12]} ${spacing[24]}`,
-              fontFamily: typography.fontFamily.sans,
-              fontSize: typography.fontSize.body,
-              fontWeight: typography.fontWeight.medium,
-              color: colors.text.primary,
-              backgroundColor: colors.primary.DEFAULT,
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
+            style={buttonStyles}
             onClick={onAction}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.primary.hover;
+              e.currentTarget.style.backgroundColor = `${colors.primary}CC`;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.primary.DEFAULT;
+              e.currentTarget.style.backgroundColor = colors.primary;
             }}
           >
             {actionLabel}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/browser';
-import { DocumentsIcon } from '@/design-system';
+import { VemiqIcon } from '@/components/VemiqIcon';
 import StudentIdentityCard from '@/components/dashboard/StudentIdentityCard';
 import ActiveReportCard from '@/components/dashboard/ActiveReportCard';
 import QuickActionsCard from '@/components/dashboard/QuickActionsCard';
@@ -11,6 +11,8 @@ import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import SkeletonLoader from '@/components/workspace/SkeletonLoader';
 import { EmptyState } from '@/design-system/components/EmptyState';
 import ErrorState from '@/components/workspace/ErrorState';
+import { Stack, Container } from '@/design-system/layouts';
+import { colors } from '@/design-system/tokens/index';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -184,56 +186,58 @@ export default function DashboardPage() {
   const hasNoData = recentReports.length === 0 && activities.length === 0 && !currentTraining;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', backgroundColor: colors.background.base }}>
       {/* Main Content */}
-      <div className="pb-24">
-        <div className="px-4 py-6 space-y-6">
-          {hasNoData ? (
-            <EmptyState
-              icon={<DocumentsIcon size={32} />}
-              title="Start Your SIWES Journey"
-              description="Create your first report to begin documenting your industrial training experience."
-              actionLabel="Create Report"
-              onAction={() => router.push('/dashboard/reports/create')}
-            />
-          ) : (
-            <>
-              {/* SECTION 1: What am I working on? */}
-              {currentTraining && (
-                <ActiveReportCard
-                  reportTitle={currentTraining.programType + ' Report'}
-                  programType={currentTraining.programType as 'SIWES' | 'SWEP'}
-                  currentChapter={currentTraining.currentChapter}
-                  progress={currentTraining.overallProgress}
-                  status={currentTraining.status}
-                  onContinue={handleContinueReport}
-                />
-              )}
-
-              {/* SECTION 2: What should I do next? */}
-              <QuickActionsCard
-                onAddLogbook={handleAddLogbook}
-                onContinueReport={handleContinueReport}
-                onOpenAI={handleOpenAI}
-                onUploadImages={handleUploadImages}
+      <div style={{ paddingBottom: '96px' }}>
+        <Container size="lg">
+          <Stack spacing="xl">
+            {hasNoData ? (
+              <EmptyState
+                icon="no_reports"
+                title="Start Your SIWES Journey"
+                description="Create your first report to begin documenting your industrial training experience."
+                actionLabel="Create Report"
+                onAction={() => router.push('/dashboard/reports/create')}
               />
+            ) : (
+              <>
+                {/* SECTION 1: What am I working on? */}
+                {currentTraining && (
+                  <ActiveReportCard
+                    reportTitle={currentTraining.programType + ' Report'}
+                    programType={currentTraining.programType as 'SIWES' | 'SWEP'}
+                    currentChapter={currentTraining.currentChapter}
+                    progress={currentTraining.overallProgress}
+                    status={currentTraining.status}
+                    onContinue={handleContinueReport}
+                  />
+                )}
 
-              {/* SECTION 3: What did I do recently? */}
-              <RecentActivityCard activities={activities} />
-
-              {/* SECTION 4: Who am I? + What programme? + Where am I training? */}
-              {userData && (
-                <StudentIdentityCard
-                  userName={userData.userName}
-                  institution={userData.institution}
-                  faculty={userData.faculty}
-                  department={userData.department}
-                  currentLevel={userData.currentLevel}
+                {/* SECTION 2: What should I do next? */}
+                <QuickActionsCard
+                  onAddLogbook={handleAddLogbook}
+                  onContinueReport={handleContinueReport}
+                  onOpenAI={handleOpenAI}
+                  onUploadImages={handleUploadImages}
                 />
-              )}
-            </>
-          )}
-        </div>
+
+                {/* SECTION 3: What did I do recently? */}
+                <RecentActivityCard activities={activities} />
+
+                {/* SECTION 4: Who am I? + What programme? + Where am I training? */}
+                {userData && (
+                  <StudentIdentityCard
+                    userName={userData.userName}
+                    institution={userData.institution}
+                    faculty={userData.faculty}
+                    department={userData.department}
+                    currentLevel={userData.currentLevel}
+                  />
+                )}
+              </>
+            )}
+          </Stack>
+        </Container>
       </div>
     </div>
   );

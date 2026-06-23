@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { Card } from '@/design-system/components/Card';
-import { ClockIcon, CameraIcon, MicIcon, DocumentsIcon } from '@/design-system';
+import { EmptyState } from '@/design-system/components/EmptyState';
+import { VemiqIcon } from '@/components/VemiqIcon';
+import { colors, spacing } from '@/design-system/tokens/index';
 
 interface Upload {
   id: string;
@@ -20,12 +22,12 @@ export function UploadTimeline({ uploads }: UploadTimelineProps) {
 
   const getIcon = (fileType: string) => {
     if (fileType.startsWith('image/')) {
-      return <CameraIcon size={16} className="text-purple-500" />;
+      return <VemiqIcon category="content" name="image" size={16} />;
     }
     if (fileType.startsWith('audio/')) {
-      return <MicIcon size={16} className="text-orange-500" />;
+      return <VemiqIcon category="content" name="voice" size={16} />;
     }
-    return <DocumentsIcon size={16} className="text-gray-500" />;
+    return <VemiqIcon category="content" name="file" size={16} />;
   };
 
   const formatTime = (dateString: string) => {
@@ -44,30 +46,79 @@ export function UploadTimeline({ uploads }: UploadTimelineProps) {
 
   if (uploads.length === 0) {
     return (
-      <Card className="p-6 text-center">
-        <ClockIcon size={48} className="text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">No uploads yet</p>
-      </Card>
+      <EmptyState
+        icon="no_uploads"
+        title="No uploads yet"
+        description="Upload your first file to get started"
+      />
     );
   }
 
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Upload Timeline</h3>
-      <div className="relative">
-        <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200" />
-        <div className="space-y-4 pl-8">
+    <Card style={{ padding: spacing.xl }}>
+      <h3 style={{
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '18px',
+        fontWeight: '600',
+        color: colors.text.primary,
+        marginBottom: spacing.lg,
+      }}>
+        Upload Timeline
+      </h3>
+      <div style={{ position: 'relative' }}>
+        <div style={{
+          position: 'absolute',
+          left: '12px',
+          top: 0,
+          bottom: 0,
+          width: '2px',
+          backgroundColor: colors.border,
+        }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, paddingLeft: spacing.xl }}>
           {uploads.map((upload, index) => (
-            <div key={upload.id} className="relative">
-              <div className="absolute -left-8 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                {getIcon(upload.file_type)}
-              </div>
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-foreground text-sm">{upload.file_name}</span>
-                  <span className="text-xs text-muted-foreground">{formatTime(upload.uploaded_at)}</span>
+            <div key={upload.id} style={{ position: 'relative' }}>
+              <div style={{
+                position: 'absolute',
+                left: '-32px',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                backgroundColor: colors.primary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <div style={{ color: colors.text.primary }}>
+                  {getIcon(upload.file_type)}
                 </div>
-                <p className="text-xs text-muted-foreground">
+              </div>
+              <div style={{
+                padding: spacing.md,
+                backgroundColor: colors.background.surface,
+                borderRadius: '8px',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs }}>
+                  <span style={{
+                    fontFamily: 'system-ui, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: colors.text.primary,
+                  }}>
+                    {upload.file_name}
+                  </span>
+                  <span style={{
+                    fontFamily: 'system-ui, sans-serif',
+                    fontSize: '12px',
+                    color: colors.text.secondary,
+                  }}>
+                    {formatTime(upload.uploaded_at)}
+                  </span>
+                </div>
+                <p style={{
+                  fontFamily: 'system-ui, sans-serif',
+                  fontSize: '12px',
+                  color: colors.text.secondary,
+                }}>
                   {new Date(upload.uploaded_at).toLocaleString()}
                 </p>
               </div>

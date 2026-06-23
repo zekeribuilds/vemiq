@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@/design-system/components/Card';
+import { colors, spacing } from '@/design-system/tokens/index';
 
 interface StudentIdentityCardProps {
   userName: string;
@@ -18,25 +19,82 @@ export default function StudentIdentityCard({
   currentLevel,
 }: StudentIdentityCardProps) {
   return (
-    <Card className="rounded-2xl p-6">
-      <div className="flex items-start justify-between mb-4">
+    <Card style={{ padding: spacing.lg }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: spacing.md }}>
         <div>
-          <h2 className="text-lg font-semibold text-foreground mb-1">{userName}</h2>
-          <p className="text-sm text-muted-foreground">{institution || 'Not specified'}</p>
+          <h2 style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '18px',
+            fontWeight: '600',
+            color: colors.text.primary,
+            marginBottom: spacing.xs,
+          }}>
+            {userName}
+          </h2>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '14px',
+            fontWeight: '400',
+            color: colors.text.secondary,
+          }}>
+            {institution || 'Not specified'}
+          </p>
         </div>
-        <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
-          <span className="text-xs font-medium text-primary">{currentLevel || 'Not specified'}</span>
+        <div style={{
+          padding: `${spacing.xs} ${spacing.sm}`,
+          backgroundColor: `${colors.primary}1A`,
+          border: `1px solid ${colors.primary}33`,
+          borderRadius: '9999px',
+        }}>
+          <span style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '12px',
+            fontWeight: '500',
+            color: colors.primary,
+          }}>
+            {currentLevel || 'Not specified'}
+          </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: spacing.md }}>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Faculty</p>
-          <p className="text-sm text-foreground">{faculty || 'Not specified'}</p>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '12px',
+            fontWeight: '400',
+            color: colors.text.secondary,
+            marginBottom: spacing.xs,
+          }}>
+            Faculty
+          </p>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '14px',
+            fontWeight: '400',
+            color: colors.text.primary,
+          }}>
+            {faculty || 'Not specified'}
+          </p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Department</p>
-          <p className="text-sm text-foreground">{department || 'Not specified'}</p>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '12px',
+            fontWeight: '400',
+            color: colors.text.secondary,
+            marginBottom: spacing.xs,
+          }}>
+            Department
+          </p>
+          <p style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '14px',
+            fontWeight: '400',
+            color: colors.text.primary,
+          }}>
+            {department || 'Not specified'}
+          </p>
         </div>
       </div>
     </Card>

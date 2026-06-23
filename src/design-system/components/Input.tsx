@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { colors, radius, spacing, typography, shadows } from '../tokens';
+import { colors, spacing } from '../tokens/index';
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
@@ -34,50 +34,36 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputStyles: React.CSSProperties = {
       width: fullWidth ? '100%' : 'auto',
       minHeight: '40px',
-      padding: `${spacing[12]} ${spacing[16]}`,
-      fontFamily: typography.fontFamily.sans,
-      fontSize: typography.fontSize.body,
-      fontWeight: typography.fontWeight.regular,
+      padding: `${spacing.sm} ${spacing.md}`,
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: '16px',
+      fontWeight: '400',
       color: colors.text.primary,
       backgroundColor: colors.background.surface,
-      border: `1px solid ${error ? colors.error.DEFAULT : colors.border.DEFAULT}`,
-      borderRadius: radius[8],
+      border: `1px solid ${error ? colors.danger : colors.border}`,
+      borderRadius: '8px',
       outline: 'none',
       transition: 'all 0.2s ease',
       cursor: disabled ? 'not-allowed' : 'text',
-      ...(leftIcon && { paddingLeft: spacing[48] }),
-      ...(rightIcon && { paddingRight: spacing[48] }),
-    };
-
-    const focusStyles: React.CSSProperties = {
-      borderColor: colors.border.focus,
-      boxShadow: shadows.glow,
-    };
-
-    const hoverStyles: React.CSSProperties = {
-      borderColor: colors.border.hover,
-    };
-
-    const disabledStyles: React.CSSProperties = {
-      opacity: 0.5,
-      cursor: 'not-allowed',
+      ...(leftIcon && { paddingLeft: spacing.xl }),
+      ...(rightIcon && { paddingRight: spacing.xl }),
     };
 
     const labelStyles: React.CSSProperties = {
       display: 'block',
-      marginBottom: spacing[8],
-      fontFamily: typography.fontFamily.sans,
-      fontSize: typography.fontSize.caption,
-      fontWeight: typography.fontWeight.medium,
-      color: error ? colors.error.DEFAULT : colors.text.secondary,
+      marginBottom: spacing.sm,
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: '12px',
+      fontWeight: '500',
+      color: error ? colors.danger : colors.text.secondary,
     };
 
     const errorStyles: React.CSSProperties = {
-      marginTop: spacing[8],
-      fontFamily: typography.fontFamily.sans,
-      fontSize: typography.fontSize.small,
-      fontWeight: typography.fontWeight.regular,
-      color: colors.error.DEFAULT,
+      marginTop: spacing.sm,
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: '12px',
+      fontWeight: '400',
+      color: colors.danger,
     };
 
     const iconStyles: React.CSSProperties = {
@@ -86,7 +72,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       transform: 'translateY(-50%)',
       display: 'flex',
       alignItems: 'center',
-      color: colors.text.tertiary,
+      color: colors.text.muted,
       pointerEvents: 'none',
     };
 
@@ -95,40 +81,40 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && <label style={labelStyles}>{label}</label>}
         <div style={{ position: 'relative', display: 'inline-block', width: fullWidth ? '100%' : 'auto' }}>
           {leftIcon && (
-            <div style={{ ...iconStyles, left: spacing[12] }}>{leftIcon}</div>
+            <div style={{ ...iconStyles, left: spacing.sm }}>{leftIcon}</div>
           )}
           <input
             ref={ref}
             disabled={disabled}
             style={{
               ...inputStyles,
-              ...(disabled ? disabledStyles : {}),
+              ...(disabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}),
               ...style,
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = colors.border.focus;
-              e.currentTarget.style.boxShadow = shadows.glow;
+              e.currentTarget.style.borderColor = colors.primary;
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}33`;
               props.onFocus?.(e);
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = error ? colors.error.DEFAULT : colors.border.DEFAULT;
+              e.currentTarget.style.borderColor = error ? colors.danger : colors.border;
               e.currentTarget.style.boxShadow = 'none';
               props.onBlur?.(e);
             }}
             onMouseEnter={(e) => {
               if (!disabled) {
-                e.currentTarget.style.borderColor = colors.border.hover;
+                e.currentTarget.style.borderColor = colors.text.secondary;
               }
             }}
             onMouseLeave={(e) => {
               if (!disabled) {
-                e.currentTarget.style.borderColor = error ? colors.error.DEFAULT : colors.border.DEFAULT;
+                e.currentTarget.style.borderColor = error ? colors.danger : colors.border;
               }
             }}
             {...props}
           />
           {rightIcon && (
-            <div style={{ ...iconStyles, right: spacing[12] }}>{rightIcon}</div>
+            <div style={{ ...iconStyles, right: spacing.sm }}>{rightIcon}</div>
           )}
         </div>
         {error && <div style={errorStyles}>{error}</div>}

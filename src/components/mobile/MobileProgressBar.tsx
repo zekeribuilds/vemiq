@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { colors } from '@/design-system/tokens/index';
 
 interface MobileProgressBarProps {
   progress: number;
@@ -11,7 +12,7 @@ interface MobileProgressBarProps {
 
 export default function MobileProgressBar({
   progress,
-  color = '#22C55E',
+  color = colors.success,
   height = 8,
   showLabel = false,
 }: MobileProgressBarProps) {
