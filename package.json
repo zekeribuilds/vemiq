@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prebuild": "npm run lint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
