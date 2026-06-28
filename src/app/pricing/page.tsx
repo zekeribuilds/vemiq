@@ -30,7 +30,7 @@ export default function PricingPage() {
               maxWidth: '768px',
               margin: '0 auto',
             }}>
-              No subscriptions. No recurring charges. Only pay for the report pages you generate.
+              Pay only for the report pages you generate.
             </p>
           </div>
 
@@ -281,7 +281,7 @@ export default function PricingPage() {
                 color: colors.text.secondary,
                 marginBottom: spacing.md,
               }}>
-                Pay only for the pages you generate. No monthly subscription required.
+                Pay only for the pages you generate.
               </p>
 
               <Link href="/signup">
@@ -380,7 +380,7 @@ export default function PricingPage() {
               margin: '0 auto',
               marginBottom: spacing.lg,
             }}>
-              Most students only need to generate one report. A subscription forces you to pay whether you use the platform or not. Vemiq's pricing is designed to be simple:
+              Most students only need to generate one report. Vemiq's pricing is designed to be simple:
             </p>
             <Stack spacing="sm" style={{ maxWidth: '42rem', margin: '0 auto' }}>
               {[
@@ -510,10 +510,6 @@ export default function PricingPage() {
                 {
                   q: 'Why does Vemiq charge per page?',
                   a: 'Industrial training reports vary in length. Charging per page ensures students only pay for the content they actually generate.',
-                },
-                {
-                  q: 'Is there a subscription?',
-                  a: 'No. Vemiq uses a pay-per-page model. You are not charged monthly or annually.',
                 },
                 {
                   q: 'Can I generate only part of my report?',

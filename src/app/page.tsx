@@ -316,11 +316,6 @@ export default function Home() {
                   Get Started Free
                 </Button>
               </Link>
-              <Link href="/pricing" style={{ textDecoration: 'none' }}>
-                <Button size="lg" variant="ghost">
-                  View Pricing
-                </Button>
-              </Link>
             </Stack>
           </div>
         </Container>

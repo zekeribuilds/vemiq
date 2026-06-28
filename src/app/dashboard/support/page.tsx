@@ -35,10 +35,6 @@ export default function SupportPage() {
       q: 'What file formats are supported for images?',
       a: 'We support JPG, PNG, and PDF files up to 10MB in size.',
     },
-    {
-      q: 'How do I cancel my subscription?',
-      a: 'Go to Settings > Billing and click "Cancel Subscription". You can cancel anytime.',
-    },
   ];
 
   return (
@@ -71,7 +67,6 @@ export default function SupportPage() {
                   >
                     <option value="">Select a topic</option>
                     <option value="technical">Technical Issue</option>
-                    <option value="billing">Billing Question</option>
                     <option value="feature">Feature Request</option>
                     <option value="other">Other</option>
                   </select>

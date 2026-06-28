@@ -129,7 +129,7 @@ export const activityEvents = {
     logActivityEvent({
       event_type: 'payment_completed',
       event_title: `Payment completed: ₦${amount}`,
-      event_description: 'Subscription payment processed',
+      event_description: 'Payment processed',
       report_id: reportId,
     }),
 };

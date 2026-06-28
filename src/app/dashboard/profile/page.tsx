@@ -31,13 +31,6 @@ export default function DashboardProfilePage() {
       ],
     },
     {
-      title: 'Subscription',
-      items: [
-        { icon: CreditCardIcon, label: 'Billing & Plans', color: 'text-yellow-500', action: () => router.push('/dashboard/billing') },
-        { icon: SettingsIcon, label: 'Preferences', color: 'text-muted-foreground', action: () => router.push('/dashboard/settings') },
-      ],
-    },
-    {
       title: 'Support',
       items: [
         { icon: HelpCircleIcon, label: 'Help Center', color: 'text-green-500', action: () => router.push('/dashboard/support') },
