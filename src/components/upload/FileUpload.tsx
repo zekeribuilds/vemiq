@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Button } from '@/design-system/components/Button';
-import { UploadIcon, XIcon } from '@/design-system';
+import { XIcon } from '@/design-system';
 
 interface FileUploadProps {
   onUpload: (file: File) => Promise<void>;
@@ -76,7 +76,8 @@ export function FileUpload({
         <div className="inline-block cursor-pointer">
           <Button
             isLoading={isUploading}
-            leftIcon={<UploadIcon size={20} />}
+            icon="upload"
+            iconPosition="left"
             onClick={() => fileInputRef.current?.click()}
           >
             {label}

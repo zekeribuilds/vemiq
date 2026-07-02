@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SendIcon, RefreshCwIcon, SparklesIcon, MinusIcon, CreateIcon, GraduationCapIcon, SuccessIcon } from '@/design-system';
+import { SparklesIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 
@@ -17,11 +17,11 @@ export default function ChatPanel({ sectionId, sectionContent, onContentChange }
   const [chatHistory, setChatHistory] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
 
   const quickActions = [
-    { icon: RefreshCwIcon, label: 'Rewrite', action: 'rewrite' },
-    { icon: CreateIcon, label: 'Expand', action: 'expand' },
-    { icon: MinusIcon, label: 'Shorten', action: 'shorten' },
-    { icon: GraduationCapIcon, label: 'Formalize', action: 'formalize' },
-    { icon: SuccessIcon, label: 'Fix Grammar', action: 'grammar' },
+    { label: 'Rewrite', action: 'rewrite' },
+    { label: 'Expand', action: 'expand' },
+    { label: 'Shorten', action: 'shorten' },
+    { label: 'Formalize', action: 'formalize' },
+    { label: 'Fix Grammar', action: 'grammar' },
   ];
 
   const handleSendMessage = async () => {
@@ -112,22 +112,18 @@ export default function ChatPanel({ sectionId, sectionContent, onContentChange }
       <div className="p-4 border-b border-border">
         <p className="text-xs font-medium text-foreground mb-3">QUICK ACTIONS</p>
         <div className="grid grid-cols-5 gap-2">
-          {quickActions.map((action) => {
-            const Icon = action.icon;
-            return (
-              <Button
-                key={action.action}
-                onClick={() => handleQuickAction(action.action)}
-                disabled={isLoading}
-                variant="ghost"
-                size="sm"
-                leftIcon={<Icon size={18} className="text-muted-foreground" />}
-                className="flex-col gap-1"
-              >
-                <span className="text-xs text-muted-foreground">{action.label}</span>
-              </Button>
-            );
-          })}
+          {quickActions.map((action) => (
+            <Button
+              key={action.action}
+              onClick={() => handleQuickAction(action.action)}
+              disabled={isLoading}
+              variant="ghost"
+              size="sm"
+              className="flex-col gap-1"
+            >
+              <span className="text-xs text-muted-foreground">{action.label}</span>
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -185,7 +181,8 @@ export default function ChatPanel({ sectionId, sectionContent, onContentChange }
             onClick={handleSendMessage}
             disabled={!message.trim() || isLoading}
             size="md"
-            leftIcon={<SendIcon size={20} />}
+            icon="send"
+            iconPosition="left"
           />
         </div>
       </div>

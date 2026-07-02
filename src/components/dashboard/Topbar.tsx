@@ -1,6 +1,6 @@
 'use client';
 
-import { SearchIcon, ProfileIcon, ExportIcon } from '@/design-system';
+import { ProfileIcon, SearchIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { createClient } from '@/lib/supabase/browser';
@@ -77,7 +77,7 @@ export default function Topbar() {
             size="sm"
             title="Logout"
           >
-            <ExportIcon size={16} />
+            Logout
           </Button>
         </div>
       </div>

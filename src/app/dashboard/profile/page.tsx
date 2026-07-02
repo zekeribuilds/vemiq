@@ -172,8 +172,9 @@ export default function DashboardProfilePage() {
               className="absolute bottom-0 right-0 w-10 h-10 p-0 rounded-full border-4 border-card"
               size="sm"
               variant="primary"
-              leftIcon={<CameraIcon size={18} />}
-            />
+            >
+              📷
+            </Button>
           </div>
           <div>
             <h2 className="text-2xl font-semibold text-foreground mb-1">{userProfile?.name || 'User'}</h2>
@@ -231,14 +232,14 @@ export default function DashboardProfilePage() {
                     size="md"
                     fullWidth
                     className={`justify-start ${index !== section.items.length - 1 ? 'border-b border-border rounded-none' : ''}`}
-                    leftIcon={
+                  >
+                    <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                         <Icon size={18} className={item.color} />
                       </div>
-                    }
-                    rightIcon={<ChevronRightIcon size={18} />}
-                  >
-                    {item.label}
+                      <span>{item.label}</span>
+                      <ChevronRightIcon size={18} className="ml-auto" />
+                    </div>
                   </Button>
                 );
               })}
@@ -254,7 +255,8 @@ export default function DashboardProfilePage() {
           fullWidth
           size="md"
           variant="ghost"
-          leftIcon={<LogOutIcon size={20} />}
+          icon="close"
+          iconPosition="left"
         >
           Logout
         </Button>

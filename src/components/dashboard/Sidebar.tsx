@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { navigationItems } from '@/lib/navigation-config';
+import { VemiqIcon } from '@/components/VemiqIcon';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -17,7 +18,6 @@ export default function Sidebar() {
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           {navigationItems.map((item) => {
-            const Icon = item.icon;
             const isActive = pathname === item.href;
 
             return (
@@ -30,7 +30,7 @@ export default function Sidebar() {
                       : 'text-muted-foreground hover:bg-muted hover:text-primary dark:hover:text-white'
                   }`}
                 >
-                  <Icon size={16} />
+                  <VemiqIcon category="nav" name={item.iconKey} size={16} />
                   <span className="font-medium text-base">{item.label}</span>
                 </Link>
               </li>

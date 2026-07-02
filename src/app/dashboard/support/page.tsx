@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageSquareIcon, MailIcon, BookOpenIcon, SearchIcon, SendIcon, SuccessIcon, SparklesIcon } from '@/design-system';
+import { MessageSquareIcon, MailIcon, BookOpenIcon, SearchIcon, SuccessIcon, SparklesIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { Textarea } from '@/design-system/components/Textarea';
@@ -83,7 +83,8 @@ export default function SupportPage() {
 
                 <Button
                   type="submit"
-                  leftIcon={<SendIcon size={20} />}
+                  icon="send"
+                  iconPosition="left"
                   size="md"
                 >
                   Send Message

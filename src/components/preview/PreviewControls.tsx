@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { ZoomInIcon, ZoomOutIcon, ChevronLeftIcon, ChevronRightIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 
 interface PreviewControlsProps {
@@ -51,8 +50,9 @@ export default function PreviewControls({
           disabled={zoom <= 50}
           variant="ghost"
           size="sm"
-          leftIcon={<ZoomOutIcon size={20} />}
-        />
+        >
+          -
+        </Button>
         <span className="text-sm font-semibold text-foreground min-w-[60px] text-center">
           {zoom}%
         </span>
@@ -61,8 +61,9 @@ export default function PreviewControls({
           disabled={zoom >= 200}
           variant="ghost"
           size="sm"
-          leftIcon={<ZoomInIcon size={20} />}
-        />
+        >
+          +
+        </Button>
       </div>
 
       <div className="flex items-center gap-3">
@@ -71,8 +72,9 @@ export default function PreviewControls({
           disabled={currentPage <= 1}
           variant="ghost"
           size="sm"
-          leftIcon={<ChevronLeftIcon size={20} />}
-        />
+        >
+          ←
+        </Button>
         <span className="text-sm font-semibold text-foreground min-w-[100px] text-center">
           Page {currentPage} of {totalPages}
         </span>
@@ -81,8 +83,9 @@ export default function PreviewControls({
           disabled={currentPage >= totalPages}
           variant="ghost"
           size="sm"
-          leftIcon={<ChevronRightIcon size={20} />}
-        />
+        >
+          →
+        </Button>
       </div>
 
       <div className="flex items-center gap-2">

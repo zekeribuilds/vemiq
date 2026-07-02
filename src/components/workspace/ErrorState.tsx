@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ErrorIcon, RefreshCwIcon } from '@/design-system';
+import { ErrorIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 
 interface ErrorStateProps {
@@ -28,7 +28,8 @@ export default function ErrorState({ title, description, onRetry }: ErrorStatePr
           onClick={onRetry}
           variant="secondary"
           size="md"
-          leftIcon={<RefreshCwIcon size={18} />}
+          icon="refresh"
+          iconPosition="left"
         >
           Retry
         </Button>
