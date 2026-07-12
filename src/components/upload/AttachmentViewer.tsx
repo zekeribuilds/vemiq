@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
-import { DocumentsIcon, CameraIcon, MicIcon, BookOpenIcon } from '@/design-system';
+import { DownloadIcon, DeleteIcon, DocumentsIcon, CameraIcon, MicIcon, BookOpenIcon } from '@/design-system';
 
 interface Attachment {
   id: string;
@@ -89,8 +89,7 @@ export function AttachmentViewer({
                   variant="ghost"
                   size="sm"
                   onClick={() => onDownload(attachment)}
-                  icon="download"
-                  iconPosition="left"
+                  leftIcon={<DownloadIcon size={16} />}
                 >
                   Download
                 </Button>
@@ -101,8 +100,7 @@ export function AttachmentViewer({
                   size="sm"
                   onClick={() => handleDelete(attachment.id)}
                   isLoading={deletingId === attachment.id}
-                  icon="delete"
-                  iconPosition="left"
+                  leftIcon={<DeleteIcon size={16} />}
                 >
                   Delete
                 </Button>

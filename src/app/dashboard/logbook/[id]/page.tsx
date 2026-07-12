@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/browser';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
-import { CalendarIcon, EditIcon, DeleteIcon } from '@/design-system';
+import { ChevronLeftIcon, CreateIcon, CalendarIcon, EditIcon, DeleteIcon } from '@/design-system';
 
 export default function LogbookDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -122,8 +122,9 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
           size="sm"
           onClick={() => router.back()}
           className="mb-4"
+          leftIcon={<ChevronLeftIcon size={20} />}
         >
-          ← Back to Logbooks
+          Back to Logbooks
         </Button>
         <h1 className="text-3xl font-bold text-foreground mb-2">{logbook?.title || 'Logbook'}</h1>
         <p className="text-muted-foreground">
@@ -137,8 +138,7 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
           <Button
             onClick={() => setShowAddWeek(!showAddWeek)}
             size="sm"
-            icon="create"
-            iconPosition="left"
+            leftIcon={<CreateIcon size={20} />}
           >
             Add Week
           </Button>

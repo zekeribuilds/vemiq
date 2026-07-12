@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Card } from '@/design-system/components/Card';
+import { XIcon, ZoomInIcon, ZoomOutIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 
 interface ImagePreviewProps {
@@ -22,14 +23,14 @@ export function ImagePreview({ imageUrl, fileName, onClose }: ImagePreviewProps)
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-foreground truncate">{fileName}</h3>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={handleZoomOut}>
+            <Button variant="ghost" size="sm" onClick={handleZoomOut} leftIcon={<ZoomOutIcon size={16} />}>
               Zoom Out
             </Button>
             <span className="text-sm text-muted-foreground">{Math.round(zoom * 100)}%</span>
-            <Button variant="ghost" size="sm" onClick={handleZoomIn}>
+            <Button variant="ghost" size="sm" onClick={handleZoomIn} leftIcon={<ZoomInIcon size={16} />}>
               Zoom In
             </Button>
-            <Button variant="ghost" size="sm" onClick={onClose} icon="close" iconPosition="left">
+            <Button variant="ghost" size="sm" onClick={onClose} leftIcon={<XIcon size={16} />}>
               Close
             </Button>
           </div>

@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { colors, spacing } from '../tokens/index';
+import { colors, radius, spacing, typography, shadows } from '../tokens';
 
 export interface CardProps {
   children: React.ReactNode;
@@ -21,9 +21,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ children, className = '', style, ...props }, ref) => {
     const cardStyles: React.CSSProperties = {
       backgroundColor: colors.background.surface,
-      border: `1px solid ${colors.border}`,
-      borderRadius: '12px',
-      padding: spacing.lg,
+      border: `1px solid ${colors.border.DEFAULT}`,
+      borderRadius: radius[12],
+      padding: spacing[24],
       ...style,
     };
 
@@ -49,28 +49,28 @@ export const ContextCard = React.forwardRef<HTMLDivElement, ContextCardProps>(
     return (
       <Card ref={ref} className={className} style={style} {...props}>
         {(title || subtitle || avatar) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.md }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing[16], marginBottom: spacing[16] }}>
             {avatar && (
               <div style={{ flexShrink: 0 }}>{avatar}</div>
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
               {title && (
                 <div style={{
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: '20px',
-                  fontWeight: '600',
+                  fontFamily: typography.fontFamily.sans,
+                  fontSize: typography.fontSize.h3,
+                  fontWeight: typography.fontWeight.semibold,
                   color: colors.text.primary,
-                  marginBottom: spacing.xs,
+                  marginBottom: spacing[4],
                 }}>
                   {title}
                 </div>
               )}
               {subtitle && (
                 <div style={{
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: '12px',
-                  fontWeight: '400',
-                  color: colors.text.muted,
+                  fontFamily: typography.fontFamily.sans,
+                  fontSize: typography.fontSize.caption,
+                  fontWeight: typography.fontWeight.regular,
+                  color: colors.text.tertiary,
                 }}>
                   {subtitle}
                 </div>
@@ -97,9 +97,9 @@ export const ActionCard = React.forwardRef<HTMLDivElement, ActionCardProps>(
   ({ onClick, hoverable = true, disabled = false, children, className = '', style, ...props }, ref) => {
     const cardStyles: React.CSSProperties = {
       backgroundColor: colors.background.surface,
-      border: `1px solid ${colors.border}`,
-      borderRadius: '12px',
-      padding: spacing.lg,
+      border: `1px solid ${colors.border.DEFAULT}`,
+      borderRadius: radius[12],
+      padding: spacing[24],
       cursor: disabled ? 'not-allowed' : onClick ? 'pointer' : 'default',
       transition: 'all 0.2s ease',
       opacity: disabled ? 0.5 : 1,
@@ -108,14 +108,14 @@ export const ActionCard = React.forwardRef<HTMLDivElement, ActionCardProps>(
 
     const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
       if (!disabled && hoverable && onClick) {
-        e.currentTarget.style.borderColor = colors.text.secondary;
+        e.currentTarget.style.borderColor = colors.border.hover;
         e.currentTarget.style.backgroundColor = colors.background.elevated;
       }
     };
 
     const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
       if (!disabled && hoverable && onClick) {
-        e.currentTarget.style.borderColor = colors.border;
+        e.currentTarget.style.borderColor = colors.border.DEFAULT;
         e.currentTarget.style.backgroundColor = colors.background.surface;
       }
     };
@@ -151,29 +151,29 @@ export const ContentCard = React.forwardRef<HTMLDivElement, ContentCardProps>(
     return (
       <Card ref={ref} className={className} style={style} {...props}>
         {(title || subtitle || icon || action) && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: spacing.md }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: spacing[16] }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: spacing[12], flex: 1, minWidth: 0 }}>
               {icon && (
-                <div style={{ flexShrink: 0, color: colors.primary }}>{icon}</div>
+                <div style={{ flexShrink: 0, color: colors.primary.DEFAULT }}>{icon}</div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 {title && (
                   <div style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '20px',
-                    fontWeight: '600',
+                    fontFamily: typography.fontFamily.sans,
+                    fontSize: typography.fontSize.h3,
+                    fontWeight: typography.fontWeight.semibold,
                     color: colors.text.primary,
-                    marginBottom: spacing.xs,
+                    marginBottom: spacing[4],
                   }}>
                     {title}
                   </div>
                 )}
                 {subtitle && (
                   <div style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: '400',
-                    color: colors.text.muted,
+                    fontFamily: typography.fontFamily.sans,
+                    fontSize: typography.fontSize.caption,
+                    fontWeight: typography.fontWeight.regular,
+                    color: colors.text.tertiary,
                   }}>
                     {subtitle}
                   </div>
@@ -181,7 +181,7 @@ export const ContentCard = React.forwardRef<HTMLDivElement, ContentCardProps>(
               </div>
             </div>
             {action && (
-              <div style={{ flexShrink: 0, marginLeft: spacing.sm }}>{action}</div>
+              <div style={{ flexShrink: 0, marginLeft: spacing[12] }}>{action}</div>
             )}
           </div>
         )}
@@ -202,15 +202,15 @@ export interface ActivityCardProps extends CardProps {
 export const ActivityCard = React.forwardRef<HTMLDivElement, ActivityCardProps>(
   ({ timestamp, type = 'info', children, className = '', style, ...props }, ref) => {
     const typeColors = {
-      info: colors.info,
-      success: colors.success,
-      warning: colors.warning,
-      error: colors.danger,
+      info: colors.info.DEFAULT,
+      success: colors.success.DEFAULT,
+      warning: colors.warning.DEFAULT,
+      error: colors.error.DEFAULT,
     };
 
     return (
-      <Card ref={ref} className={className} style={{ padding: spacing.md, ...style }} {...props}>
-        <div style={{ display: 'flex', gap: spacing.sm }}>
+      <Card ref={ref} className={className} style={{ padding: spacing[16], ...style }} {...props}>
+        <div style={{ display: 'flex', gap: spacing[12] }}>
           <div style={{
             width: '8px',
             height: '8px',
@@ -223,11 +223,11 @@ export const ActivityCard = React.forwardRef<HTMLDivElement, ActivityCardProps>(
             {children}
             {timestamp && (
               <div style={{
-                marginTop: spacing.sm,
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '12px',
-                fontWeight: '400',
-                color: colors.text.muted,
+                marginTop: spacing[8],
+                fontFamily: typography.fontFamily.sans,
+                fontSize: typography.fontSize.small,
+                fontWeight: typography.fontWeight.regular,
+                color: colors.text.quaternary,
               }}>
                 {timestamp}
               </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ErrorIcon } from '@/design-system';
+import { ErrorIcon, RefreshCwIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 
 export default function Error({
@@ -28,8 +28,7 @@ export default function Error({
         <Button
           onClick={reset}
           size="md"
-          icon="refresh"
-          iconPosition="left"
+          leftIcon={<RefreshCwIcon size={20} />}
         >
           Try Again
         </Button>

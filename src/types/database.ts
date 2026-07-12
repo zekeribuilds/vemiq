@@ -21,6 +21,7 @@ export interface Database {
           institution_id: string | null
           faculty_id: string | null
           department_id: string | null
+          subscription_plan: string
           onboarding_completed: boolean
           created_at: string
           updated_at: string
@@ -36,6 +37,7 @@ export interface Database {
           institution_id?: string | null
           faculty_id?: string | null
           department_id?: string | null
+          subscription_plan?: string
           onboarding_completed?: boolean
           created_at?: string
           updated_at?: string
@@ -51,6 +53,7 @@ export interface Database {
           institution_id?: string | null
           faculty_id?: string | null
           department_id?: string | null
+          subscription_plan?: string
           onboarding_completed?: boolean
           updated_at?: string
         }

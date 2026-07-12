@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { VemiqIcon } from '@/components/VemiqIcon';
+import { ProfileIcon, MailIcon, OrganizationIcon, GraduationCapIcon, SaveIcon, BellIcon, LockIcon, DownloadIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
 import { Card } from '@/design-system/components/Card';
-import { Container, Stack } from '@/design-system/layouts';
-import { colors, spacing } from '@/design-system/tokens/index';
 import { createClient } from '@/lib/supabase/browser';
+import PageContainer from '@/components/layout/PageContainer';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'security' | 'exports'>('profile');
@@ -24,10 +23,10 @@ export default function SettingsPage() {
   const [exportHistory, setExportHistory] = useState<any[]>([]);
 
   const tabs = [
-    { id: 'profile' as const, label: 'Profile', iconKey: 'profile' },
-    { id: 'notifications' as const, label: 'Notifications', iconKey: 'notifications' },
-    { id: 'security' as const, label: 'Security', iconKey: 'settings' },
-    { id: 'exports' as const, label: 'Exports & Payments', iconKey: 'download' },
+    { id: 'profile' as const, label: 'Profile', icon: ProfileIcon },
+    { id: 'notifications' as const, label: 'Notifications', icon: BellIcon },
+    { id: 'security' as const, label: 'Security', icon: LockIcon },
+    { id: 'exports' as const, label: 'Exports & Payments', icon: DownloadIcon },
   ];
 
   useEffect(() => {
@@ -134,173 +133,104 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <Container size="lg">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '256px' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            border: `4px solid ${colors.primary}`,
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-          }} />
+      <PageContainer>
+        <div className="flex items-center justify-center h-64">
+          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
-      </Container>
+      </PageContainer>
     );
   }
 
   return (
-    <Container size="lg">
-      <div style={{ marginBottom: spacing.xl }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: spacing.sm,
-          padding: `${spacing.sm} ${spacing.md}`,
-          backgroundColor: `${colors.primary}1A`,
-          color: colors.primary,
-          borderRadius: '9999px',
-          fontFamily: 'system-ui, sans-serif',
-          fontSize: '14px',
-          fontWeight: '500',
-          marginBottom: spacing.md,
-        }}>
+    <PageContainer>
+      <div className="mb-8 animate-fade-in">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
           <span>Settings</span>
         </div>
-        <h1 style={{
-          fontFamily: 'system-ui, sans-serif',
-          fontSize: '30px',
-          fontWeight: '700',
-          color: colors.text.primary,
-          marginBottom: spacing.sm,
-        }}>
-          Settings
-        </h1>
-        <p style={{
-          fontFamily: 'system-ui, sans-serif',
-          fontSize: '16px',
-          fontWeight: '400',
-          color: colors.text.secondary,
-        }}>
-          Manage your account settings and preferences
-        </p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
+        <p className="text-muted-foreground">Manage your account settings and preferences</p>
       </div>
 
-      <div style={{ display: 'flex', gap: spacing.xl }}>
-        <aside style={{ width: '256px' }}>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm }}>
-            {tabs.map((tab) => (
-              <Button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                variant="ghost"
-                size="md"
-                icon={tab.iconKey}
-                iconPosition="left"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: spacing.md,
-                  width: '100%',
-                  padding: `${spacing.sm} ${spacing.md}`,
-                  borderRadius: '16px',
-                  transition: 'all 0.2s ease',
-                  backgroundColor: activeTab === tab.id ? `linear-gradient(to right, ${colors.primary}, ${colors.primary})` : 'transparent',
-                  color: activeTab === tab.id ? colors.text.primary : colors.text.secondary,
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== tab.id) {
-                    e.currentTarget.style.backgroundColor = `${colors.primary}1A`;
-                    e.currentTarget.style.color = colors.primary;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== tab.id) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = colors.text.secondary;
-                  }
-                }}
-              >
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontWeight: '500' }}>{tab.label}</span>
-              </Button>
-            ))}
+      <div className="flex gap-8">
+        <aside className="w-64">
+          <nav className="space-y-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <Button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  variant="ghost"
+                  size="md"
+                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/30'
+                      : 'text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:text-white'
+                  }`}
+                  leftIcon={<Icon size={20} />}
+                >
+                  <span className="font-medium">{tab.label}</span>
+                </Button>
+              );
+            })}
           </nav>
         </aside>
 
-        <main style={{ flex: 1 }}>
+        <main className="flex-1">
           {activeTab === 'profile' && (
-            <Card style={{ padding: spacing.xl }}>
-              <h2 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '24px',
-                fontWeight: '700',
-                color: colors.text.primary,
-                marginBottom: spacing.lg,
-              }}>
-                Profile Settings
-              </h2>
+            <Card className="p-8 animate-scale-in">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Profile Settings</h2>
 
-              <Stack spacing="lg">
-                <Input
-                  label="Full Name"
-                  value={userData?.fullName || ''}
-                  onChange={(e) => setUserData(prev => prev ? { ...prev, fullName: e.target.value } : { fullName: e.target.value, email: '', institution: '', faculty: '', department: '', currentLevel: '' })}
-                  fullWidth
-                />
+              <div className="space-y-6">
+                  <Input
+                    label="Full Name"
+                    value={userData?.fullName || ''}
+                    onChange={(e) => setUserData(prev => prev ? { ...prev, fullName: e.target.value } : { fullName: e.target.value, email: '', institution: '', faculty: '', department: '', currentLevel: '' })}
+                    leftIcon={<ProfileIcon size={20} />}
+                    fullWidth
+                  />
 
-                <Input
-                  label="Email"
-                  type="email"
-                  value={userData?.email || ''}
-                  disabled
-                  fullWidth
-                />
+                  <Input
+                    label="Email"
+                    type="email"
+                    value={userData?.email || ''}
+                    disabled
+                    leftIcon={<MailIcon size={20} />}
+                    fullWidth
+                  />
 
-                <Input
-                  label="Institution"
-                  value={userData?.institution || ''}
-                  onChange={(e) => setUserData(prev => prev ? { ...prev, institution: e.target.value } : { fullName: '', email: '', institution: e.target.value, faculty: '', department: '', currentLevel: '' })}
-                  fullWidth
-                />
+                  <Input
+                    label="Institution"
+                    value={userData?.institution || ''}
+                    onChange={(e) => setUserData(prev => prev ? { ...prev, institution: e.target.value } : { fullName: '', email: '', institution: e.target.value, faculty: '', department: '', currentLevel: '' })}
+                    leftIcon={<OrganizationIcon size={20} />}
+                    fullWidth
+                  />
 
-                <Input
-                  label="Faculty"
-                  value={userData?.faculty || ''}
-                  onChange={(e) => setUserData(prev => prev ? { ...prev, faculty: e.target.value } : { fullName: '', email: '', institution: '', faculty: e.target.value, department: '', currentLevel: '' })}
-                  fullWidth
-                />
+                  <Input
+                    label="Faculty"
+                    value={userData?.faculty || ''}
+                    onChange={(e) => setUserData(prev => prev ? { ...prev, faculty: e.target.value } : { fullName: '', email: '', institution: '', faculty: e.target.value, department: '', currentLevel: '' })}
+                    leftIcon={<GraduationCapIcon size={20} />}
+                    fullWidth
+                  />
 
-                <Input
-                  label="Department"
-                  value={userData?.department || ''}
-                  onChange={(e) => setUserData(prev => prev ? { ...prev, department: e.target.value } : { fullName: '', email: '', institution: '', faculty: '', department: e.target.value, currentLevel: '' })}
-                  fullWidth
-                />
+                  <Input
+                    label="Department"
+                    value={userData?.department || ''}
+                    onChange={(e) => setUserData(prev => prev ? { ...prev, department: e.target.value } : { fullName: '', email: '', institution: '', faculty: '', department: e.target.value, currentLevel: '' })}
+                    leftIcon={<GraduationCapIcon size={20} />}
+                    fullWidth
+                  />
 
                 <div>
-                  <label style={{
-                    display: 'block',
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: colors.text.primary,
-                    marginBottom: spacing.sm,
-                  }}>
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Current Level
                   </label>
                   <select
                     value={userData?.currentLevel || ''}
                     onChange={(e) => setUserData(prev => prev ? { ...prev, currentLevel: e.target.value } : { fullName: '', email: '', institution: '', faculty: '', department: '', currentLevel: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: `${spacing.sm} ${spacing.md}`,
-                      backgroundColor: colors.background.elevated,
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: '8px',
-                      color: colors.text.primary,
-                      fontFamily: 'system-ui, sans-serif',
-                      fontSize: '16px',
-                    }}
+                    className="input-field"
                   >
                     <option value="">Select your level</option>
                     <option value="100">100</option>
@@ -315,86 +245,40 @@ export default function SettingsPage() {
                   onClick={handleSave}
                   disabled={isSaving}
                   isLoading={isSaving}
-                  icon="save"
-                  iconPosition="left"
+                  leftIcon={<SaveIcon size={20} />}
                   size="md"
                 >
                   Save Changes
                 </Button>
-              </Stack>
+              </div>
             </Card>
           )}
 
           {activeTab === 'notifications' && (
-            <Card style={{ padding: spacing.xl }}>
-              <h2 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '24px',
-                fontWeight: '700',
-                color: colors.text.primary,
-                marginBottom: spacing.lg,
-              }}>
-                Notification Settings
-              </h2>
+            <Card className="p-8 animate-scale-in">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Notification Settings</h2>
 
-              <Stack spacing="md">
+              <div className="space-y-4">
                 {[
                   'Email notifications for report generation',
                   'Email notifications for payment confirmations',
                   'Weekly progress updates',
                   'Product updates and new features',
                 ].map((item) => (
-                  <label key={item} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: spacing.md,
-                    cursor: 'pointer',
-                    padding: spacing.sm,
-                    backgroundColor: colors.background.elevated,
-                    borderRadius: '16px',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.primary}1A`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.background.elevated;
-                  }}
-                  >
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '4px',
-                      border: `1px solid ${colors.border}`,
-                      backgroundColor: colors.primary,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      <div style={{ color: colors.text.primary }}>
-                        <VemiqIcon category="status" name="completed" size={12} />
-                      </div>
-                    </div>
-                    <span style={{
-                      fontFamily: 'system-ui, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: '400',
-                      color: colors.text.secondary,
-                    }}>
-                      {item}
-                    </span>
+                  <label key={item} className="flex items-center gap-3 cursor-pointer p-3 bg-muted rounded-2xl hover:bg-primary/10 transition-colors">
+                    <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-border text-primary focus:ring-primary" />
+                    <span className="text-muted-foreground">{item}</span>
                   </label>
                 ))}
-              </Stack>
+              </div>
 
               <Button
                 onClick={handleSave}
                 disabled={isSaving}
                 isLoading={isSaving}
-                icon="save"
-                iconPosition="left"
+                leftIcon={<SaveIcon size={20} />}
                 size="md"
-                style={{ marginTop: spacing.lg }}
+                className="mt-6"
               >
                 Save Changes
               </Button>
@@ -402,18 +286,10 @@ export default function SettingsPage() {
           )}
 
           {activeTab === 'security' && (
-            <Card style={{ padding: spacing.xl }}>
-              <h2 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '24px',
-                fontWeight: '700',
-                color: colors.text.primary,
-                marginBottom: spacing.lg,
-              }}>
-                Security Settings
-              </h2>
+            <Card className="p-8 animate-scale-in">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Security Settings</h2>
 
-              <Stack spacing="lg">
+              <div className="space-y-6">
                   <Input
                     label="Current Password"
                     type="password"
@@ -436,53 +312,24 @@ export default function SettingsPage() {
                   onClick={handleSave}
                   disabled={isSaving}
                   isLoading={isSaving}
-                  icon="save"
-                  iconPosition="left"
+                  leftIcon={<SaveIcon size={20} />}
                   size="md"
                 >
                   Update Password
                 </Button>
-              </Stack>
+              </div>
             </Card>
           )}
 
           {activeTab === 'exports' && (
-            <Card style={{ padding: spacing.xl }}>
-              <h2 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '24px',
-                fontWeight: '700',
-                color: colors.text.primary,
-                marginBottom: spacing.lg,
-              }}>
-                Exports & Payments
-              </h2>
+            <Card className="p-8 animate-scale-in">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Exports & Payments</h2>
 
-              <div style={{
-                padding: spacing.lg,
-                backgroundColor: `${colors.primary}1A`,
-                borderRadius: '24px',
-                marginBottom: spacing.lg,
-                border: `2px solid ${colors.primary}`,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md }}>
+              <div className="p-6 bg-primary/10 rounded-3xl mb-6 border-2 border-primary">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 style={{
-                      fontFamily: 'system-ui, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      color: colors.text.primary,
-                    }}>
-                      Export Pricing
-                    </h3>
-                    <p style={{
-                      fontFamily: 'system-ui, sans-serif',
-                      fontSize: '14px',
-                      fontWeight: '400',
-                      color: colors.text.secondary,
-                    }}>
-                      ₦300 per page
-                    </p>
+                    <h3 className="font-semibold text-foreground">Export Pricing</h3>
+                    <p className="text-muted-foreground">₦300 per page</p>
                   </div>
                   <Button 
                     size="md"
@@ -493,87 +340,36 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <h3 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '16px',
-                fontWeight: '600',
-                color: colors.text.primary,
-                marginBottom: spacing.md,
-              }}>
-                Export History
-              </h3>
+              <h3 className="font-semibold text-foreground mb-4">Export History</h3>
               {exportHistory.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: spacing.xl }}>
-                  <p style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    color: colors.text.secondary,
-                  }}>
-                    No export history available
-                  </p>
-                  <p style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    color: colors.text.secondary,
-                    marginTop: spacing.sm,
-                  }}>
-                    Your paid exports will appear here
-                  </p>
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No export history available</p>
+                  <p className="text-sm mt-2">Your paid exports will appear here</p>
                 </div>
               ) : (
-                <Stack spacing="md">
+                <div className="space-y-3">
                   {exportHistory.map((version) => (
-                    <div key={version.id} style={{
-                      padding: spacing.md,
-                      backgroundColor: colors.background.elevated,
-                      borderRadius: '8px',
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm }}>
-                        <span style={{
-                          fontFamily: 'system-ui, sans-serif',
-                          fontSize: '16px',
-                          fontWeight: '500',
-                          color: colors.text.primary,
-                        }}>
+                    <div key={version.id} className="p-4 bg-muted rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-foreground">
                           {version.report?.title || 'Unknown Report'}
                         </span>
-                        <span style={{
-                          fontFamily: 'system-ui, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: '400',
-                          color: colors.text.secondary,
-                        }}>
+                        <span className="text-sm text-muted-foreground">
                           {new Date(version.generated_at).toLocaleDateString()}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
-                        <span style={{
-                          fontFamily: 'system-ui, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: '400',
-                          color: colors.text.secondary,
-                        }}>
-                          {version.page_count} pages
-                        </span>
-                        <span style={{
-                          fontFamily: 'system-ui, sans-serif',
-                          fontSize: '14px',
-                          fontWeight: '400',
-                          color: colors.text.secondary,
-                        }}>
-                          Version {version.version_number}
-                        </span>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>{version.page_count} pages</span>
+                        <span>Version {version.version_number}</span>
                       </div>
                     </div>
                   ))}
-                </Stack>
+                </div>
               )}
             </Card>
           )}
         </main>
       </div>
-    </Container>
+    </PageContainer>
   );
 }

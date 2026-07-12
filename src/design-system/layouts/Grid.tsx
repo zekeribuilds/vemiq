@@ -9,8 +9,9 @@ import React from 'react';
 import { spacing } from '../tokens/index';
 
 export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
-  columns?: number;
+  columns?: number | { sm?: number; md?: number; lg?: number; xl?: number };
   gap?: keyof typeof spacing;
+  useTailwindGrid?: boolean;
 }
 
 export const Grid = React.forwardRef<HTMLDivElement, GridProps>(
@@ -18,6 +19,7 @@ export const Grid = React.forwardRef<HTMLDivElement, GridProps>(
     {
       columns = 2,
       gap = 'md',
+      useTailwindGrid = false,
       className = '',
       style,
       children,
@@ -27,9 +29,13 @@ export const Grid = React.forwardRef<HTMLDivElement, GridProps>(
   ) => {
     const gridStyles: React.CSSProperties = {
       display: 'grid',
-      gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
       gap: spacing[gap],
       ...style,
+      ...(useTailwindGrid !== true && columns !== undefined && {
+        gridTemplateColumns: typeof columns === 'number' 
+          ? `repeat(${columns}, minmax(0, 1fr))`
+          : `repeat(${(columns as any)?.sm || 1}, minmax(0, 1fr))`,
+      }),
     };
 
     return (

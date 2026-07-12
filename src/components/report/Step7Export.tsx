@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { VemiqIcon } from '@/components/VemiqIcon';
+import { DownloadIcon, SuccessIcon, DocumentsIcon, CreditCardIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
-import { Stack } from '@/design-system/layouts';
-import { colors, spacing } from '@/design-system/tokens/index';
 import { useReportStore } from '@/store/reportStore';
 import { getPricingSummary } from '@/lib/export-pricing-config';
 
@@ -93,100 +91,45 @@ export default function Step7Export() {
   };
 
   return (
-    <div style={{ maxWidth: '48rem', margin: '0 auto' }}>
-      <h2 style={{
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '24px',
-        fontWeight: '700',
-        color: colors.text.primary,
-        marginBottom: spacing.md,
-      }}>
-        Export Your Report
-      </h2>
-      <p style={{
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '16px',
-        color: colors.text.secondary,
-        marginBottom: spacing.xl,
-      }}>
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold text-foreground mb-4">Export Your Report</h2>
+      <p className="text-muted-foreground mb-8">
         Download your report as a print-ready PDF.
       </p>
 
       {!showPayment && !exportComplete && !isExporting && (
-        <Card style={{ padding: spacing.xl }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.xl }}>
-            <div style={{
-              width: '64px',
-              height: '64px',
-              backgroundColor: `${colors.primary}10`,
-              borderRadius: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <div style={{ color: colors.primary }}>
-                <VemiqIcon category="data" name="report" size={32} />
-              </div>
+        <Card className="p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center">
+              <DocumentsIcon className="text-primary" size={32} />
             </div>
             <div>
-              <h3 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '18px',
-                fontWeight: '600',
-                color: colors.text.primary,
-              }}>
+              <h3 className="text-lg font-semibold text-foreground">
                 {reportType} Report
               </h3>
-              <p style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '14px',
-                color: colors.text.secondary,
-              }}>
+              <p className="text-muted-foreground">
                 {studentInfo.companyName} • {studentInfo.academicSession}
               </p>
             </div>
           </div>
 
-          <div style={{
-            marginBottom: spacing.xl,
-            padding: spacing.md,
-            backgroundColor: colors.background.elevated,
-            borderRadius: '16px',
-          }}>
-            <Stack spacing="md">
-              <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-                <div style={{ color: colors.success }}>
-                  <VemiqIcon category="status" name="completed" size={18} />
-                </div>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>
-                  {weeklyLogs.length} weekly logs processed
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-                <div style={{ color: colors.success }}>
-                  <VemiqIcon category="status" name="completed" size={18} />
-                </div>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>
-                  {reportStructure.numberOfChapters} chapters generated
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-                <div style={{ color: colors.success }}>
-                  <VemiqIcon category="status" name="completed" size={18} />
-                </div>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>
-                  Times New Roman, 12pt, 1.5 spacing
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-                <div style={{ color: colors.success }}>
-                  <VemiqIcon category="status" name="completed" size={18} />
-                </div>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>
-                  A4 format with proper margins
-                </span>
-              </div>
-            </Stack>
+          <div className="space-y-3 mb-6 p-4 bg-muted rounded-2xl">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>{weeklyLogs.length} weekly logs processed</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>{reportStructure.numberOfChapters} chapters generated</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>Times New Roman, 12pt, 1.5 spacing</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>A4 format with proper margins</span>
+            </div>
           </div>
 
           <Button
@@ -194,8 +137,7 @@ export default function Step7Export() {
             isLoading={isExporting}
             fullWidth
             size="md"
-            icon="download"
-            iconPosition="left"
+            leftIcon={<DownloadIcon size={20} />}
           >
             Export as PDF
           </Button>
@@ -203,102 +145,46 @@ export default function Step7Export() {
       )}
 
       {showPayment && !exportComplete && (
-        <Card style={{ padding: spacing.xl }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.xl }}>
-            <div style={{
-              width: '64px',
-              height: '64px',
-              backgroundColor: `${colors.primary}10`,
-              borderRadius: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <div style={{ color: colors.primary }}>
-                <VemiqIcon category="action" name="download" size={32} />
-              </div>
+        <Card className="p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center">
+              <CreditCardIcon className="text-primary" size={32} />
             </div>
             <div>
-              <h3 style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '18px',
-                fontWeight: '600',
-                color: colors.text.primary,
-              }}>
+              <h3 className="text-lg font-semibold text-foreground">
                 Export Summary
               </h3>
-              <p style={{
-                fontFamily: 'system-ui, sans-serif',
-                fontSize: '14px',
-                color: colors.text.secondary,
-              }}>
+              <p className="text-muted-foreground">
                 {reportType} Report • {studentInfo.companyName}
               </p>
             </div>
           </div>
 
-          <div style={{
-            marginBottom: spacing.xl,
-            padding: spacing.xl,
-            backgroundColor: `${colors.primary}05`,
-            borderRadius: '16px',
-            border: `2px solid ${colors.primary}20`,
-          }}>
-            <Stack spacing="md">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px', color: colors.text.secondary }}>
-                  Estimated Pages
-                </span>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px', fontWeight: '600', color: colors.text.primary }}>
-                  {pricing.pages}
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px', color: colors.text.secondary }}>
-                  Cost Per Page
-                </span>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px', fontWeight: '600', color: colors.text.primary }}>
-                  ₦{pricing.pricePerPage}
-                </span>
-              </div>
-              <div style={{
-                borderTop: `1px solid ${colors.primary}20`,
-                paddingTop: spacing.md,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-                <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px', fontWeight: '600', color: colors.text.primary }}>
-                  Total Cost
-                </span>
-                <span style={{
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: '24px',
-                  fontWeight: '700',
-                  color: colors.primary,
-                }}>
-                  {pricing.formattedCost}
-                </span>
-              </div>
-            </Stack>
+          <div className="space-y-4 mb-6 p-6 bg-primary/5 rounded-2xl border-2 border-primary/20">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Estimated Pages</span>
+              <span className="text-foreground font-semibold">{pricing.pages}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Cost Per Page</span>
+              <span className="text-foreground font-semibold">₦{pricing.pricePerPage}</span>
+            </div>
+            <div className="border-t border-primary/20 pt-4 flex justify-between items-center">
+              <span className="text-foreground font-semibold">Total Cost</span>
+              <span className="text-2xl font-bold text-primary">{pricing.formattedCost}</span>
+            </div>
           </div>
 
-          <p style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '14px',
-            color: colors.text.secondary,
-            marginBottom: spacing.xl,
-            textAlign: 'center',
-          }}>
+          <p className="text-sm text-muted-foreground mb-6 text-center">
             Payment is processed securely via Paystack. You will be redirected to complete your payment.
           </p>
 
-          <div style={{ display: 'flex', gap: spacing.md }}>
+          <div className="flex gap-4">
             <Button
               onClick={() => setShowPayment(false)}
               variant="ghost"
               size="md"
-              style={{ flex: 1 }}
+              className="flex-1"
             >
               Back
             </Button>
@@ -306,9 +192,8 @@ export default function Step7Export() {
               onClick={handlePayment}
               isLoading={isProcessingPayment}
               size="md"
-              icon="download"
-              iconPosition="left"
-              style={{ flex: 1 }}
+              leftIcon={<CreditCardIcon size={20} />}
+              className="flex-1"
             >
               Pay {pricing.formattedCost}
             </Button>
@@ -317,70 +202,30 @@ export default function Step7Export() {
       )}
 
       {isExporting && (
-        <Card style={{ padding: spacing.xl, textAlign: 'center' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            border: `4px solid ${colors.primary}`,
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: `0 auto ${spacing.md} auto`,
-          }} />
-          <h3 style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '18px',
-            fontWeight: '600',
-            color: colors.text.primary,
-            marginBottom: spacing.sm,
-          }}>
+        <Card className="p-8 text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Generating PDF...
           </h3>
-          <p style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '16px',
-            color: colors.text.secondary,
-          }}>
+          <p className="text-muted-foreground">
             This may take a few moments. Please don't close this page.
           </p>
         </Card>
       )}
 
       {exportComplete && (
-        <Card style={{ padding: spacing.xl, textAlign: 'center' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            backgroundColor: `${colors.success}10`,
-            borderRadius: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: `0 auto ${spacing.md} auto`,
-          }}>
-            <div style={{ color: colors.success }}>
-              <VemiqIcon category="status" name="success" size={32} />
-            </div>
+        <Card className="p-8 text-center">
+          <div className="w-16 h-16 bg-success/10 rounded-3xl flex items-center justify-center mx-auto mb-4">
+            <SuccessIcon className="text-success" size={32} />
           </div>
-          <h3 style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '18px',
-            fontWeight: '600',
-            color: colors.text.primary,
-            marginBottom: spacing.sm,
-          }}>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Export Complete!
           </h3>
-          <p style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '16px',
-            color: colors.text.secondary,
-            marginBottom: spacing.xl,
-          }}>
+          <p className="text-muted-foreground mb-6">
             Your report has been downloaded successfully.
           </p>
 
-          <div style={{ display: 'flex', gap: spacing.md, justifyContent: 'center' }}>
+          <div className="flex gap-4 justify-center">
             <Button onClick={handleViewReports} variant="ghost" size="md">
               View All Reports
             </Button>

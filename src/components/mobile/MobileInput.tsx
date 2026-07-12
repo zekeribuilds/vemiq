@@ -3,7 +3,6 @@
 import { forwardRef, InputHTMLAttributes, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/design-system/components/Input';
-import { colors } from '@/design-system/tokens/index';
 
 interface MobileInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -16,7 +15,7 @@ const MobileInput = forwardRef<HTMLInputElement, MobileInputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: colors.text.secondary, marginBottom: '8px' }}>
+          <label className="block text-sm font-medium text-[#A3A3A3] mb-2">
             {label}
           </label>
         )}

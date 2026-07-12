@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { BoldIcon, ItalicIcon, ListIcon, ListOrderedIcon, UndoIcon, RedoIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 
 interface RichTextEditorProps {
@@ -35,50 +36,44 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
           disabled={!editor.can().chain().focus().toggleBold().run()}
           variant={editor.isActive('bold') ? 'secondary' : 'ghost'}
           size="sm"
-        >
-          B
-        </Button>
+          leftIcon={<BoldIcon size={16} />}
+        />
         <Button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           variant={editor.isActive('italic') ? 'secondary' : 'ghost'}
           size="sm"
-        >
-          I
-        </Button>
+          leftIcon={<ItalicIcon size={16} />}
+        />
         <Button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           disabled={!editor.can().chain().focus().toggleBulletList().run()}
           variant={editor.isActive('bulletList') ? 'secondary' : 'ghost'}
           size="sm"
-        >
-          •
-        </Button>
+          leftIcon={<ListIcon size={16} />}
+        />
         <Button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           disabled={!editor.can().chain().focus().toggleOrderedList().run()}
           variant={editor.isActive('orderedList') ? 'secondary' : 'ghost'}
           size="sm"
-        >
-          1.
-        </Button>
+          leftIcon={<ListOrderedIcon size={16} />}
+        />
         <div className="w-px h-6 bg-gray-300 mx-2" />
         <Button
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().chain().focus().undo().run()}
           variant="ghost"
           size="sm"
-        >
-          ↩
-        </Button>
+          leftIcon={<UndoIcon size={16} />}
+        />
         <Button
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().chain().focus().redo().run()}
           variant="ghost"
           size="sm"
-        >
-          ↪
-        </Button>
+          leftIcon={<RedoIcon size={16} />}
+        />
       </div>
       <EditorContent editor={editor} />
     </div>

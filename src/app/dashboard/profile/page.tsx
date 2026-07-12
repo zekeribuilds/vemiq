@@ -31,6 +31,13 @@ export default function DashboardProfilePage() {
       ],
     },
     {
+      title: 'Subscription',
+      items: [
+        { icon: CreditCardIcon, label: 'Billing & Plans', color: 'text-yellow-500', action: () => router.push('/dashboard/billing') },
+        { icon: SettingsIcon, label: 'Preferences', color: 'text-muted-foreground', action: () => router.push('/dashboard/settings') },
+      ],
+    },
+    {
       title: 'Support',
       items: [
         { icon: HelpCircleIcon, label: 'Help Center', color: 'text-green-500', action: () => router.push('/dashboard/support') },
@@ -172,9 +179,8 @@ export default function DashboardProfilePage() {
               className="absolute bottom-0 right-0 w-10 h-10 p-0 rounded-full border-4 border-card"
               size="sm"
               variant="primary"
-            >
-              📷
-            </Button>
+              leftIcon={<CameraIcon size={18} />}
+            />
           </div>
           <div>
             <h2 className="text-2xl font-semibold text-foreground mb-1">{userProfile?.name || 'User'}</h2>
@@ -232,14 +238,14 @@ export default function DashboardProfilePage() {
                     size="md"
                     fullWidth
                     className={`justify-start ${index !== section.items.length - 1 ? 'border-b border-border rounded-none' : ''}`}
-                  >
-                    <div className="flex items-center gap-3">
+                    leftIcon={
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                         <Icon size={18} className={item.color} />
                       </div>
-                      <span>{item.label}</span>
-                      <ChevronRightIcon size={18} className="ml-auto" />
-                    </div>
+                    }
+                    rightIcon={<ChevronRightIcon size={18} />}
+                  >
+                    {item.label}
                   </Button>
                 );
               })}
@@ -255,8 +261,7 @@ export default function DashboardProfilePage() {
           fullWidth
           size="md"
           variant="ghost"
-          icon="close"
-          iconPosition="left"
+          leftIcon={<LogOutIcon size={20} />}
         >
           Logout
         </Button>

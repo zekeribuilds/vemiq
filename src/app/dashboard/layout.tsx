@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from '@/components/dashboard/Sidebar';
 import BottomNavigation from '@/components/mobile/BottomNavigation';
+import { DocumentsIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
 import { EmptyState } from '@/design-system/components/EmptyState';
@@ -59,7 +60,7 @@ export default async function DashboardLayout({
             <h3 className="text-sm font-semibold text-primary mb-4">Recent Activity</h3>
             <Card className="rounded-xl p-4">
               <EmptyState
-                icon="no_activity"
+                icon={<DocumentsIcon size={24} />}
                 title="No recent activity"
                 description="Your activities will appear here"
               />

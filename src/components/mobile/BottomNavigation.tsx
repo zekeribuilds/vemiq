@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { navigationItems } from '@/lib/navigation-config';
-import { VemiqIcon } from '@/components/VemiqIcon';
 
 export default function BottomNavigation() {
   const pathname = usePathname();
@@ -21,6 +20,7 @@ export default function BottomNavigation() {
         <nav className="flex items-center justify-around h-[72px] px-2">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
+            const Icon = item.icon;
 
             return (
               <Link
@@ -29,11 +29,9 @@ export default function BottomNavigation() {
                 className="flex flex-col items-center justify-center flex-1 min-h-[44px] relative group"
               >
                 {/* Icon */}
-                <VemiqIcon
-                  category="nav"
-                  name={item.iconKey}
+                <Icon
                   size={24}
-                  className="mb-1 transition-colors text-white"
+                  className={`mb-1 transition-colors text-white`}
                 />
 
                 {/* Label */}

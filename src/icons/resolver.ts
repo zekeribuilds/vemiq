@@ -32,3 +32,11 @@ export function getIcon(
 
   return set[key as keyof typeof set]
 }
+
+/** Convert registry kebab-case Lucide names to PascalCase export keys. */
+export function toLucideComponentName(kebabName: string): string {
+  return kebabName
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("")
+}

@@ -148,9 +148,9 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
                     variant={activeTab === tab.id ? 'primary' : 'ghost'}
                     size="md"
                     fullWidth
+                    leftIcon={<Icon size={20} />}
                     className="justify-start"
                   >
-                    <Icon size={20} className="mr-2" />
                     {tab.label}
                   </Button>
                 </li>
@@ -164,8 +164,7 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
             fullWidth
             size="md"
             variant="ghost"
-            icon="download"
-            iconPosition="left"
+            leftIcon={<DownloadIcon size={20} />}
             className="justify-start"
           >
             Export PDF
@@ -174,8 +173,7 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
             fullWidth
             size="md"
             variant="ghost"
-            icon="settings"
-            iconPosition="left"
+            leftIcon={<SettingsIcon size={20} />}
             className="justify-start"
           >
             Settings

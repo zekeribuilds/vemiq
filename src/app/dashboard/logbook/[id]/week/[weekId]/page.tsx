@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/browser';
 import PageContainer from '@/components/layout/PageContainer';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
-import { MicIcon, CameraIcon, SparklesIcon } from '@/design-system';
+import { ChevronLeftIcon, SaveIcon, MicIcon, CameraIcon, UploadIcon, SparklesIcon } from '@/design-system';
 import { FileUpload } from '@/components/upload/FileUpload';
 import { AttachmentViewer } from '@/components/upload/AttachmentViewer';
 
@@ -205,8 +205,9 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
           size="sm"
           onClick={() => router.back()}
           className="mb-4"
+          leftIcon={<ChevronLeftIcon size={20} />}
         >
-          ← Back to Logbook
+          Back to Logbook
         </Button>
         <h1 className="text-3xl font-bold text-foreground mb-2">
           {week?.title || `Week ${week?.week_number}`}
@@ -228,8 +229,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
               isLoading={isSaving}
               size="sm"
               variant="secondary"
-              icon="save"
-              iconPosition="left"
+              leftIcon={<SaveIcon size={16} />}
             >
               Save
             </Button>
@@ -252,6 +252,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  leftIcon={<MicIcon size={16} />}
                   onClick={() => setSelectedDay(day)}
                 >
                   Voice
@@ -259,6 +260,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  leftIcon={<CameraIcon size={16} />}
                   onClick={() => setSelectedDay(day)}
                 >
                   Image
@@ -266,8 +268,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  icon="upload"
-                  iconPosition="left"
+                  leftIcon={<UploadIcon size={16} />}
                   onClick={() => setSelectedDay(day)}
                 >
                   Upload
@@ -288,6 +289,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
             <Button
               onClick={handleGenerateSummary}
               size="sm"
+              leftIcon={<SparklesIcon size={16} />}
               fullWidth
             >
               Generate Summary

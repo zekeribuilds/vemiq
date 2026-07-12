@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DocumentsIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { EmptyState } from '@/design-system/components/EmptyState';
 
@@ -143,7 +144,7 @@ export const LogbookIntegration: React.FC<LogbookIntegrationProps> = ({
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {filteredEntries.length === 0 ? (
           <EmptyState
-            icon="no_data"
+            icon={<DocumentsIcon size={24} />}
             title="No entries match the current filter"
             description="Try selecting a different date range or filter"
           />

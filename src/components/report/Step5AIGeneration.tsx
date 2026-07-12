@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { VemiqIcon } from '@/components/VemiqIcon';
+import { SparklesIcon, SuccessIcon, WarningIcon } from '@/design-system';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
-import { Stack } from '@/design-system/layouts';
-import { colors, spacing } from '@/design-system/tokens/index';
 import { useReportStore } from '@/store/reportStore';
 import { getGenerationSteps } from '@/lib/report-workflow';
 
@@ -59,56 +57,21 @@ export default function Step5AIGeneration() {
   };
 
   return (
-    <div style={{ maxWidth: '48rem', margin: '0 auto' }}>
-      <h2 style={{
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '24px',
-        fontWeight: '700',
-        color: colors.text.primary,
-        marginBottom: spacing.md,
-      }}>
-        AI Generation
-      </h2>
-      <p style={{
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '16px',
-        color: colors.text.secondary,
-        marginBottom: spacing.xl,
-      }}>
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold text-foreground mb-4">AI Generation</h2>
+      <p className="text-muted-foreground mb-8">
         Our AI will transform your weekly logs into a professional academic report.
       </p>
 
       {!isGenerating && Object.keys(generatedSections).length === 0 && (
-        <Card style={{ padding: spacing.xl, textAlign: 'center' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            backgroundColor: `${colors.primary}10`,
-            borderRadius: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: `0 auto ${spacing.md} auto`,
-          }}>
-            <div style={{ color: colors.primary }}>
-              <VemiqIcon category="status" name="loading" size={32} />
-            </div>
+        <Card className="p-8 text-center">
+          <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4">
+            <SparklesIcon className="text-primary" size={32} />
           </div>
-          <h3 style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '18px',
-            fontWeight: '600',
-            color: colors.text.primary,
-            marginBottom: spacing.sm,
-          }}>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Ready to Generate Your Report
           </h3>
-          <p style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '16px',
-            color: colors.text.secondary,
-            marginBottom: spacing.lg,
-          }}>
+          <p className="text-muted-foreground mb-6">
             This will process your {weeklyLogs.length} weekly logs and generate
             {reportStructure.includeDedication ? ' dedication,' : ''}
             {reportStructure.includeAcknowledgement ? ' acknowledgement,' : ''}
@@ -125,94 +88,38 @@ export default function Step5AIGeneration() {
       )}
 
       {isGenerating && (
-        <Card style={{ padding: spacing.xl }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.xl }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              border: `4px solid ${colors.primary}`,
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }} />
-            <span style={{
-              fontFamily: 'system-ui, sans-serif',
-              fontWeight: '600',
-              color: colors.text.primary,
-            }}>
-              Generating Report...
-            </span>
+        <Card className="p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="font-semibold text-foreground">Generating Report...</span>
           </div>
 
-          <Stack spacing="md">
+          <div className="space-y-3">
             {steps.map((step, index) => (
               <div
                 key={step.name}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: spacing.md,
-                  padding: spacing.md,
-                  borderRadius: '16px',
-                  backgroundColor: colors.background.elevated,
-                }}
+                className="flex items-center gap-3 p-3 rounded-2xl bg-muted"
               >
                 {index < generationProgress / 12.5 ? (
-                  <div style={{ color: colors.success }}>
-                    <VemiqIcon category="status" name="completed" size={20} />
-                  </div>
+                  <SuccessIcon className="text-success" size={20} />
                 ) : index === Math.floor(generationProgress / 12.5) ? (
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    border: `2px solid ${colors.primary}`,
-                    borderTopColor: 'transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite',
-                  }} />
+                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    border: `2px solid ${colors.border}`,
-                    borderRadius: '50%',
-                  }} />
+                  <div className="w-5 h-5 border-2 border-border rounded-full" />
                 )}
-                <span style={{
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: '14px',
-                  color: colors.text.secondary,
-                }}>
-                  {step.name}
-                </span>
+                <span className="text-muted-foreground">{step.name}</span>
               </div>
             ))}
-          </Stack>
+          </div>
 
-          <div style={{ marginTop: spacing.xl }}>
-            <div style={{
-              width: '100%',
-              backgroundColor: colors.background.elevated,
-              borderRadius: '9999px',
-              height: '8px',
-            }}>
+          <div className="mt-6">
+            <div className="w-full bg-muted rounded-full h-2">
               <div
-                style={{
-                  backgroundColor: colors.primary,
-                  height: '8px',
-                  borderRadius: '9999px',
-                  transition: 'all 0.3s ease',
-                  width: `${generationProgress}%`,
-                }}
+                className="bg-primary h-2 rounded-full transition-all"
+                style={{ width: `${generationProgress}%` }}
               />
             </div>
-            <p style={{
-              fontFamily: 'system-ui, sans-serif',
-              fontSize: '14px',
-              color: colors.text.secondary,
-              marginTop: spacing.sm,
-              textAlign: 'center',
-            }}>
+            <p className="text-sm text-muted-foreground mt-2 text-center">
               {Math.round(generationProgress)}% Complete
             </p>
           </div>
@@ -220,55 +127,38 @@ export default function Step5AIGeneration() {
       )}
 
       {!isGenerating && Object.keys(generatedSections).length > 0 && (
-        <Card style={{ padding: spacing.xl }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.xl }}>
-            <div style={{ color: colors.success }}>
-              <VemiqIcon category="status" name="success" size={24} />
-            </div>
-            <h3 style={{
-              fontFamily: 'system-ui, sans-serif',
-              fontSize: '18px',
-              fontWeight: '600',
-              color: colors.text.primary,
-            }}>
+        <Card className="p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <SuccessIcon className="text-success" size={24} />
+            <h3 className="text-lg font-semibold text-foreground">
               Report Generated Successfully!
             </h3>
           </div>
 
-          <Stack spacing="md" style={{ marginBottom: spacing.xl }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-              <div style={{ color: colors.success }}>
-                <VemiqIcon category="status" name="completed" size={18} />
-              </div>
-              <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>Introduction generated</span>
+          <div className="space-y-4 mb-6">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>Introduction generated</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-              <div style={{ color: colors.success }}>
-                <VemiqIcon category="status" name="completed" size={18} />
-              </div>
-              <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>Company Overview generated</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>Company Overview generated</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-              <div style={{ color: colors.success }}>
-                <VemiqIcon category="status" name="completed" size={18} />
-              </div>
-              <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>Activities generated</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>Activities generated</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-              <div style={{ color: colors.success }}>
-                <VemiqIcon category="status" name="completed" size={18} />
-              </div>
-              <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>Challenges generated</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>Challenges generated</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, color: colors.text.secondary }}>
-              <div style={{ color: colors.success }}>
-                <VemiqIcon category="status" name="completed" size={18} />
-              </div>
-              <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '14px' }}>Conclusion generated</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <SuccessIcon className="text-success" size={18} />
+              <span>Conclusion generated</span>
             </div>
-          </Stack>
+          </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex justify-between">
             <Button
               onClick={handleGenerate}
               variant="ghost"

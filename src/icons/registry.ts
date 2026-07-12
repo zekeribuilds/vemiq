@@ -58,6 +58,9 @@ export const STATUS_ICONS = {
   pending: "clock",
   completed: "check",
   failed: "x-circle",
+  ai: "sparkles",
+  secure: "shield",
+  featured: "star",
 } as const
 
 export const EMPTY_ICONS = {

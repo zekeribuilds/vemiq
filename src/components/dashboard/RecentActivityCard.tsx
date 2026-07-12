@@ -1,9 +1,8 @@
 'use client';
 
-import { VemiqIcon } from '@/components/VemiqIcon';
+import { ImagesIcon, DocumentsIcon, VoiceIcon, AIAssistantIcon } from '@/design-system';
 import { Card } from '@/design-system/components/Card';
 import { EmptyState } from '@/design-system/components/EmptyState';
-import { colors, spacing } from '@/design-system/tokens/index';
 
 interface Activity {
   id: string;
@@ -18,22 +17,22 @@ interface RecentActivityCardProps {
   activities: Activity[];
 }
 
-const activityIconKeys = {
-  upload: 'uploads',
-  log: 'reports',
-  generate: 'reports',
-  voice: 'mic',
-  ai: 'activity',
-  import: 'uploads',
+const activityIcons = {
+  upload: ImagesIcon,
+  log: DocumentsIcon,
+  generate: DocumentsIcon,
+  voice: VoiceIcon,
+  ai: AIAssistantIcon,
+  import: ImagesIcon,
 };
 
 const activityColors = {
-  upload: colors.success,
-  log: colors.primary,
-  generate: colors.primary,
-  voice: colors.warning,
-  ai: colors.primary,
-  import: colors.primary,
+  upload: 'text-success',
+  log: 'text-primary',
+  generate: 'text-primary',
+  voice: 'text-warning',
+  ai: 'text-primary',
+  import: 'text-primary',
 };
 
 const activityLabels = {
@@ -48,18 +47,10 @@ const activityLabels = {
 export default function RecentActivityCard({ activities }: RecentActivityCardProps) {
   if (activities.length === 0) {
     return (
-      <Card style={{ padding: spacing.lg }}>
-        <h3 style={{
-          fontFamily: 'system-ui, sans-serif',
-          fontSize: '16px',
-          fontWeight: '600',
-          color: colors.text.primary,
-          marginBottom: spacing.md,
-        }}>
-          What did I do recently?
-        </h3>
+      <Card className="rounded-2xl p-6">
+        <h3 className="text-base font-semibold text-foreground mb-4">What did I do recently?</h3>
         <EmptyState
-          icon="no_activity"
+          icon={<DocumentsIcon size={32} />}
           title="No recent activity"
           description="Your activities will appear here"
         />
@@ -68,91 +59,30 @@ export default function RecentActivityCard({ activities }: RecentActivityCardPro
   }
 
   return (
-    <Card style={{ padding: spacing.lg }}>
-      <h3 style={{
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '16px',
-        fontWeight: '600',
-        color: colors.text.primary,
-        marginBottom: spacing.md,
-      }}>
-        What did I do recently?
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm }}>
+    <Card className="rounded-2xl p-6">
+      <h3 className="text-base font-semibold text-foreground mb-4">What did I do recently?</h3>
+      <div className="space-y-3">
         {activities.slice(0, 5).map((activity) => {
-          const iconKey = activityIconKeys[activity.type as keyof typeof activityIconKeys];
+          const Icon = activityIcons[activity.type as keyof typeof activityIcons];
           const color = activityColors[activity.type as keyof typeof activityColors];
           const label = activityLabels[activity.type as keyof typeof activityLabels];
 
           return (
             <div
               key={activity.id}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: spacing.sm,
-                padding: spacing.sm,
-                backgroundColor: colors.background.elevated,
-                borderRadius: '12px',
-              }}
+              className="flex items-start gap-3 p-3 bg-muted rounded-xl"
             >
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: colors.background.surface,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <div style={{ color }}>
-                  <VemiqIcon category="nav" name={iconKey} size={18} />
-                </div>
+              <div className={`w-10 h-10 rounded-full bg-card flex items-center justify-center flex-shrink-0`}>
+                <Icon size={18} className={color} />
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs }}>
-                  <p style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: '400',
-                    color: colors.text.secondary,
-                  }}>
-                    {label}
-                  </p>
-                  <p style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: '400',
-                    color: colors.text.secondary,
-                  }}>
-                    {activity.time}
-                  </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="text-xs text-muted-foreground">{activity.time}</p>
                 </div>
-                <p style={{
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  color: colors.text.primary,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {activity.title}
-                </p>
+                <p className="text-sm text-foreground truncate">{activity.title}</p>
                 {activity.description && (
-                  <p style={{
-                    fontFamily: 'system-ui, sans-serif',
-                    fontSize: '12px',
-                    fontWeight: '400',
-                    color: `${colors.text.secondary}99`,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    marginTop: spacing.xs,
-                  }}>
-                    {activity.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground/60 truncate mt-1">{activity.description}</p>
                 )}
               </div>
             </div>

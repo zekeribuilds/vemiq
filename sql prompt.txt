@@ -1,0 +1,3272 @@
+I would make one important change before generating the final schema:
+
+**Do not create everything at once.**
+
+For Vemiq, the safest migration order is:
+
+``text
+001_extensions.sql
+002_enums.sql
+003_core_tables.sql
+004_relationship_constraints.sql
+005_indexes.sql
+006_functions_and_triggers.sql
+007_rls.sql
+008_storage.sql
+`
+
+Since you want to create the tables first and handle RLS later, Windsurf should only execute:
+
+`text
+Extensions
+Enums
+Tables
+Constraints
+Indexes
+`
+
+Nothing related to RLS, policies, triggers, or storage.
+
+---
+
+# WINDSURF PROMPT — VEMIQ DATABASE V1 (TABLES ONLY)
+
+You are a Senior Supabase Architect, PostgreSQL Database Engineer, and SaaS Backend Engineer.
+
+Create the complete Vemiq MVP database schema.
+
+Requirements:
+
+`text
+- PostgreSQL (Supabase)
+- Migration-safe SQL
+- UUID primary keys
+- No RLS
+- No policies
+- No triggers
+- No helper functions
+- No storage buckets
+- No sample data
+- No admin seed data
+- Foreign key integrity
+- Production-ready structure
+`
+
+Execute in dependency-safe order.
+
+---
+
+# STEP 1 — EXTENSIONS
+
+`sql
+create extension if not exists pgcrypto;
+`
+
+---
+
+# STEP 2 — ENUMS
+
+Create all enums before tables.
+
+`sql
+create type user_role as enum (
+    'student',
+    'admin'
+);
+
+create type program_type as enum (
+    'SWEP',
+    'SIWES'
+);
+
+create type report_status as enum (
+    'draft',
+    'completed'
+);
+
+create type payment_status as enum (
+    'pending',
+    'successful',
+    'failed'
+);
+
+create type logbook_status as enum (
+    'active',
+    'completed'
+);
+
+create type source_type as enum (
+    'text',
+    'voice',
+    'image',
+    'mixed'
+);
+
+create type file_type as enum (
+    'image',
+    'audio',
+    'pdf',
+    'document'
+);
+
+create type chat_role as enum (
+    'user',
+    'assistant'
+);
+`
+
+---
+
+# STEP 3 — INSTITUTION SYSTEM
+
+## institutions
+
+`sql
+create table public.institutions (
+    id uuid primary key default gen_random_uuid(),
+
+    name text not null unique,
+
+    logo_url text,
+
+    state text,
+
+    country text default 'Nigeria',
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+## faculties
+
+`sql
+create table public.faculties (
+    id uuid primary key default gen_random_uuid(),
+
+    institution_id uuid not null
+        references public.institutions(id)
+        on delete cascade,
+
+    name text not null,
+
+    created_at timestamptz not null default now(),
+
+    unique(institution_id, name)
+);
+`
+
+---
+
+## departments
+
+`sql
+create table public.departments (
+    id uuid primary key default gen_random_uuid(),
+
+    faculty_id uuid not null
+        references public.faculties(id)
+        on delete cascade,
+
+    name text not null,
+
+    created_at timestamptz not null default now(),
+
+    unique(faculty_id, name)
+);
+`
+
+---
+
+# STEP 4 — ORGANIZATION SYSTEM
+
+## training_organizations
+
+`sql
+create table public.training_organizations (
+    id uuid primary key default gen_random_uuid(),
+
+    name text not null unique,
+
+    address text,
+
+    industry text,
+
+    logo_url text,
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+## organization_departments
+
+`sql
+create table public.organization_departments (
+    id uuid primary key default gen_random_uuid(),
+
+    organization_id uuid not null
+        references public.training_organizations(id)
+        on delete cascade,
+
+    name text not null,
+
+    created_at timestamptz not null default now(),
+
+    unique(organization_id, name)
+);
+`
+
+---
+
+## organization_knowledge
+
+Purpose: reusable organization knowledge to reduce AI token usage.
+
+`sql
+create table public.organization_knowledge (
+    id uuid primary key default gen_random_uuid(),
+
+    organization_id uuid not null
+        references public.training_organizations(id)
+        on delete cascade,
+
+    overview text,
+
+    history text,
+
+    mission text,
+
+    tools_used text,
+
+    safety_rules text,
+
+    processes text,
+
+    notes text,
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 5 — USER PROFILES
+
+## profiles
+
+`sql
+create table public.profiles (
+    id uuid primary key
+        references auth.users(id)
+        on delete cascade,
+
+    full_name text,
+
+    avatar_url text,
+
+    institution_id uuid
+        references public.institutions(id),
+
+    faculty_id uuid
+        references public.faculties(id),
+
+    department_id uuid
+        references public.departments(id),
+
+    matric_number text,
+
+    academic_session text,
+
+    siwes_coordinator_name text,
+
+    supervisor_name text,
+
+    role user_role not null default 'student',
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 6 — LOGBOOK SYSTEM
+
+## logbooks
+
+`sql
+create table public.logbooks (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    title text not null,
+
+    program_type program_type not null,
+
+    institution_id uuid
+        references public.institutions(id),
+
+    training_organization_id uuid
+        references public.training_organizations(id),
+
+    department_name text,
+
+    start_date date,
+
+    end_date date,
+
+    status logbook_status not null default 'active',
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+## logbook_entries
+
+`sql
+create table public.logbook_entries (
+    id uuid primary key default gen_random_uuid(),
+
+    logbook_id uuid not null
+        references public.logbooks(id)
+        on delete cascade,
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    entry_date date not null,
+
+    week_number integer,
+
+    title text,
+
+    activity_description text not null,
+
+    ai_cleaned_text text,
+
+    source_type source_type not null default 'text',
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+## logbook_evidence
+
+`sql
+create table public.logbook_evidence (
+    id uuid primary key default gen_random_uuid(),
+
+    entry_id uuid not null
+        references public.logbook_entries(id)
+        on delete cascade,
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    storage_path text not null,
+
+    file_type file_type not null,
+
+    mime_type text,
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 7 — REPORT SYSTEM
+
+## reports
+
+`sql
+create table public.reports (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    title text not null,
+
+    report_type program_type not null,
+
+    institution_id uuid
+        references public.institutions(id),
+
+    training_organization_id uuid
+        references public.training_organizations(id),
+
+    status report_status not null default 'draft',
+
+    progress integer not null default 0
+        check (progress >= 0 and progress <= 100),
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+## report_sections
+
+`sql
+create table public.report_sections (
+    id uuid primary key default gen_random_uuid(),
+
+    report_id uuid not null
+        references public.reports(id)
+        on delete cascade,
+
+    title text not null,
+
+    content text,
+
+    section_order integer not null,
+
+    ai_generated boolean not null default false,
+
+    created_at timestamptz not null default now(),
+
+    updated_at timestamptz not null default now()
+);
+`
+
+---
+
+## report_versions
+
+`sql
+create table public.report_versions (
+    id uuid primary key default gen_random_uuid(),
+
+    report_id uuid not null
+        references public.reports(id)
+        on delete cascade,
+
+    snapshot jsonb,
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+## report_logbook_entries
+
+`sql
+create table public.report_logbook_entries (
+    report_id uuid not null
+        references public.reports(id)
+        on delete cascade,
+
+    entry_id uuid not null
+        references public.logbook_entries(id)
+        on delete cascade,
+
+    created_at timestamptz not null default now(),
+
+    primary key (
+        report_id,
+        entry_id
+    )
+);
+`
+
+---
+
+# STEP 8 — CHAT SYSTEM
+
+`sql
+create table public.chat_messages (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    report_id uuid
+        references public.reports(id)
+        on delete cascade,
+
+    role chat_role not null,
+
+    message text not null,
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 9 — PAYMENTS
+
+`sql
+create table public.payments (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    report_id uuid
+        references public.reports(id),
+
+    amount integer not null,
+
+    currency text not null default 'NGN',
+
+    status payment_status not null default 'pending',
+
+    reference text unique,
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 10 — FILE UPLOADS
+
+`sql
+create table public.uploads (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    file_url text not null,
+
+    file_type text,
+
+    linked_to text,
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 11 — ACTIVITY LOGS
+
+`sql
+create table public.activity_logs (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid
+        references auth.users(id)
+        on delete set null,
+
+    action text not null,
+
+    metadata jsonb,
+
+    created_at timestamptz not null default now()
+);
+`
+
+---
+
+# STEP 12 — INDEXES
+
+`sql
+create index idx_profiles_institution
+on public.profiles(institution_id);
+
+create index idx_logbooks_user
+on public.logbooks(user_id);
+
+create index idx_logbook_entries_user
+on public.logbook_entries(user_id);
+
+create index idx_logbook_entries_logbook
+on public.logbook_entries(logbook_id);
+
+create index idx_reports_user
+on public.reports(user_id);
+
+create index idx_report_sections_report
+on public.report_sections(report_id);
+
+create index idx_chat_messages_user
+on public.chat_messages(user_id);
+
+create index idx_payments_user
+on public.payments(user_id);
+
+create index idx_uploads_user
+on public.uploads(user_id);
+`
+
+---
+
+# FINAL VALIDATION
+
+Tell Windsurf to verify:
+
+`text
+✓ Extensions created
+
+✓ Enums created
+
+✓ Tables created
+
+✓ Foreign keys valid
+
+✓ Constraints valid
+
+✓ Indexes created
+
+✓ No circular dependencies
+
+✓ No RLS included
+
+✓ SQL executes successfully in Supabase SQL Editor
+`
+
+After this migration succeeds completely, move to a separate migration for:
+
+`text
+1. Helper Functions
+2. Triggers
+3. Auto Profile Creation
+4. RLS Policies
+5. Storage Buckets
+6. Storage Policies
+``
+
+This separation will dramatically reduce migration failures and make debugging much easier.
+
+
+
+The next phase should be **Functions + Triggers**, not RLS yet.
+
+Reason:
+
+``text
+Tables
+↓
+Functions
+↓
+Triggers
+↓
+Auto Profile Creation
+↓
+RLS
+↓
+Storage
+``
+
+If you create RLS before the functions and triggers that depend on them, you'll run into the same dependency problems you saw with is_admin().
+
+---
+
+# WINDSURF PROMPT — VEMIQ PHASE 2
+
+# FUNCTIONS + TRIGGERS
+
+You are a Senior PostgreSQL Architect, Supabase Engineer, and SaaS Backend Engineer.
+
+Your task is to create all reusable database functions and triggers required by Vemiq.
+
+Requirements:
+
+``text
+✓ No table creation
+✓ No RLS
+✓ No storage policies
+✓ No bucket creation
+✓ No data deletion
+✓ Migration-safe SQL
+✓ Production-ready
+`
+
+Execute in dependency-safe order.
+
+---
+
+# STEP 1 — CREATE is_admin()
+
+Purpose:
+
+`text
+Used later by RLS policies.
+`
+
+`sql
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.profiles
+        where id = auth.uid()
+        and role = 'admin'
+    );
+$$;
+`
+
+---
+
+# STEP 2 — CREATE update_updated_at_column()
+
+Purpose:
+
+`text
+Automatically update updated_at timestamps.
+`
+
+`sql
+create or replace function public.update_updated_at_column()
+returns trigger
+language plpgsql
+as $$
+begin
+    new.updated_at = now();
+    return new;
+end;
+$$;
+`
+
+---
+
+# STEP 3 — CREATE handle_new_user()
+
+Purpose:
+
+`text
+Automatically create profile after signup.
+`
+
+Must support:
+
+`text
+Email signup
+Google OAuth
+Future providers
+`
+
+`sql
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+
+    insert into public.profiles (
+        id,
+        full_name,
+        avatar_url,
+        role,
+        created_at,
+        updated_at
+    )
+    values (
+        new.id,
+
+        coalesce(
+            new.raw_user_meta_data->>'full_name',
+            new.raw_user_meta_data->>'name',
+            ''
+        ),
+
+        new.raw_user_meta_data->>'avatar_url',
+
+        'student',
+
+        now(),
+        now()
+    )
+
+    on conflict (id) do nothing;
+
+    return new;
+
+end;
+$$;
+`
+
+---
+
+# STEP 4 — CREATE calculate_report_progress()
+
+Purpose:
+
+`text
+Automatically calculate report completion.
+`
+
+Rules:
+
+`text
+Completed Sections / Total Sections × 100
+`
+
+A section is complete when:
+
+`text
+content IS NOT NULL
+AND content <> ''
+`
+
+`sql
+create or replace function public.calculate_report_progress(
+    report_uuid uuid
+)
+returns integer
+language plpgsql
+as $$
+declare
+    total_sections integer;
+    completed_sections integer;
+begin
+
+    select count(*)
+    into total_sections
+    from public.report_sections
+    where report_id = report_uuid;
+
+    select count(*)
+    into completed_sections
+    from public.report_sections
+    where report_id = report_uuid
+      and content is not null
+      and trim(content) <> '';
+
+    if total_sections = 0 then
+        return 0;
+    end if;
+
+    return round(
+        (
+            completed_sections::numeric
+            /
+            total_sections::numeric
+        ) * 100
+    );
+
+end;
+$$;
+`
+
+---
+
+# STEP 5 — CREATE refresh_report_progress()
+
+Purpose:
+
+`text
+Update reports.progress automatically.
+`
+
+`sql
+create or replace function public.refresh_report_progress()
+returns trigger
+language plpgsql
+as $$
+begin
+
+    update public.reports
+    set progress =
+        public.calculate_report_progress(
+            coalesce(
+                new.report_id,
+                old.report_id
+            )
+        )
+    where id =
+        coalesce(
+            new.report_id,
+            old.report_id
+        );
+
+    return null;
+
+end;
+$$;
+`
+
+---
+
+# STEP 6 — CREATE UPDATED_AT TRIGGERS
+
+Apply to:
+
+`text
+profiles
+
+training_organizations
+organization_knowledge
+
+logbooks
+logbook_entries
+
+reports
+report_sections
+`
+
+Example:
+
+`sql
+create trigger profiles_updated_at
+before update
+on public.profiles
+for each row
+execute function public.update_updated_at_column();
+`
+
+Create equivalent triggers for every table listed.
+
+---
+
+# STEP 7 — CREATE AUTH USER TRIGGER
+
+`sql
+drop trigger if exists on_auth_user_created
+on auth.users;
+
+create trigger on_auth_user_created
+after insert
+on auth.users
+for each row
+execute function public.handle_new_user();
+`
+
+---
+
+# STEP 8 — CREATE REPORT PROGRESS TRIGGERS
+
+Whenever:
+
+`text
+report_sections inserted
+report_sections updated
+report_sections deleted
+`
+
+Update report progress.
+
+### INSERT
+
+`sql
+create trigger report_progress_after_insert
+after insert
+on public.report_sections
+for each row
+execute function public.refresh_report_progress();
+`
+
+### UPDATE
+
+`sql
+create trigger report_progress_after_update
+after update
+on public.report_sections
+for each row
+execute function public.refresh_report_progress();
+`
+
+### DELETE
+
+`sql
+create trigger report_progress_after_delete
+after delete
+on public.report_sections
+for each row
+execute function public.refresh_report_progress();
+`
+
+---
+
+# STEP 9 — VALIDATION QUERIES
+
+Generate verification queries.
+
+### Functions
+
+`sql
+select proname
+from pg_proc
+where proname in (
+    'is_admin',
+    'handle_new_user',
+    'update_updated_at_column',
+    'calculate_report_progress',
+    'refresh_report_progress'
+);
+`
+
+---
+
+### Triggers
+
+`sql
+select
+    trigger_name,
+    event_object_table
+from information_schema.triggers
+where trigger_schema = 'public';
+`
+
+---
+
+# SUCCESS CRITERIA
+
+`text
+✓ is_admin created
+
+✓ update_updated_at_column created
+
+✓ handle_new_user created
+
+✓ calculate_report_progress created
+
+✓ refresh_report_progress created
+
+✓ updated_at triggers attached
+
+✓ auth.users trigger attached
+
+✓ report progress triggers attached
+
+✓ No dependency errors
+
+✓ SQL executes successfully
+`
+
+After this phase is successfully deployed, the next phase should be:
+
+`text
+Phase 3
+Row Level Security (RLS)
+
+Phase 4
+Storage Buckets
+
+Phase 5
+Storage Policies
+
+Phase 6
+Report Generation Workflows
+``
+
+Do not combine those phases into the same migration.
+
+
+Now that:
+
+``text
+✓ Tables exist
+✓ Functions exist
+✓ Triggers exist
+✓ Auto-profile creation exists
+`
+
+the next phase is **RLS (Row Level Security)**.
+
+This is the most important security layer in Vemiq because it protects:
+
+`text
+Student reports
+Student logbooks
+Payments
+Chat history
+Uploaded files
+Profile information
+`
+
+from being accessed by other students.
+
+---
+
+# Before Executing RLS
+
+I recommend one improvement to the schema first.
+
+Currently:
+
+`text
+institutions
+faculties
+departments
+
+training_organizations
+organization_departments
+organization_knowledge
+`
+
+are shared datasets.
+
+Students should be able to:
+
+`text
+✓ Read
+✗ Insert
+✗ Update
+✗ Delete
+`
+
+Only admins should modify them.
+
+This will be important because of your institution-logo database and organization knowledge reuse system.
+
+---
+
+# VEMIQ RLS ARCHITECTURE
+
+There are 4 security groups.
+
+## Group 1 — Public Reference Data
+
+Tables:
+
+`text
+institutions
+faculties
+departments
+
+training_organizations
+organization_departments
+organization_knowledge
+`
+
+Rules:
+
+`text
+Authenticated users:
+    SELECT
+
+Admins:
+    INSERT
+    UPDATE
+    DELETE
+`
+
+---
+
+## Group 2 — User-Owned Data
+
+Tables:
+
+`text
+profiles
+
+logbooks
+logbook_entries
+logbook_evidence
+
+reports
+report_sections
+report_versions
+report_logbook_entries
+
+chat_messages
+
+payments
+
+uploads
+
+activity_logs
+`
+
+Rules:
+
+`text
+Only owner can access.
+`
+
+Ownership:
+
+`sql
+auth.uid() = user_id
+`
+
+or inherited ownership through parent tables.
+
+---
+
+## Group 3 — Admin Data
+
+Admins can:
+
+`text
+Manage institutions
+
+Manage companies
+
+Manage organization knowledge
+
+Manage logos
+
+View platform analytics
+`
+
+Uses:
+
+`sql
+public.is_admin()
+`
+
+---
+
+## Group 4 — Auth System
+
+`text
+auth.users
+`
+
+Never create policies here.
+
+Supabase manages it.
+
+---
+
+# WINDSURF EXECUTION PROMPT
+
+Tell Windsurf:
+
+### Requirements
+
+`text
+1. Create RLS only.
+2. Do not modify tables.
+3. Do not modify functions.
+4. Do not modify triggers.
+5. Do not create storage policies.
+6. Dependency-safe SQL.
+7. Use existing public.is_admin().
+`
+
+---
+
+# ORDER OF EXECUTION
+
+`text
+1. Enable RLS
+
+2. Profiles Policies
+
+3. Public Read Policies
+
+4. Admin Policies
+
+5. User-Owned Policies
+
+6. Validation Queries
+`
+
+---
+
+# PROFILES
+
+Policies:
+
+`text
+select own profile
+insert own profile
+update own profile
+`
+
+Condition:
+
+`sql
+auth.uid() = id
+`
+
+---
+
+# INSTITUTIONS
+
+Authenticated users:
+
+`sql
+SELECT
+`
+
+Admins:
+
+`sql
+INSERT
+UPDATE
+DELETE
+`
+
+using:
+
+`sql
+public.is_admin()
+`
+
+---
+
+# FACULTIES
+
+Same pattern.
+
+---
+
+# DEPARTMENTS
+
+Same pattern.
+
+---
+
+# TRAINING ORGANIZATIONS
+
+Same pattern.
+
+---
+
+# ORGANIZATION DEPARTMENTS
+
+Same pattern.
+
+---
+
+# ORGANIZATION KNOWLEDGE
+
+Same pattern.
+
+---
+
+# LOGBOOKS
+
+Owner only.
+
+`sql
+auth.uid() = user_id
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# LOGBOOK ENTRIES
+
+Owner only.
+
+`sql
+auth.uid() = user_id
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# LOGBOOK EVIDENCE
+
+Ownership inherited through:
+
+`text
+logbook_entries
+`
+
+Use EXISTS query.
+
+---
+
+# REPORTS
+
+Owner only.
+
+`sql
+auth.uid() = user_id
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# REPORT SECTIONS
+
+Ownership inherited from report.
+
+Use:
+
+`sql
+exists (
+  select 1
+  from public.reports r
+  where r.id = report_id
+  and r.user_id = auth.uid()
+)
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# REPORT VERSIONS
+
+Ownership inherited from report.
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# REPORT LOGBOOK ENTRIES
+
+Ownership inherited from report.
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# CHAT MESSAGES
+
+Owner only.
+
+`sql
+auth.uid() = user_id
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# PAYMENTS
+
+Owner only.
+
+`sql
+auth.uid() = user_id
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+`
+
+No delete policy.
+
+---
+
+# UPLOADS
+
+Owner only.
+
+`sql
+auth.uid() = user_id
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# ACTIVITY LOGS
+
+User:
+
+`sql
+auth.uid() = user_id
+`
+
+Admin:
+
+`sql
+public.is_admin()
+`
+
+for full visibility.
+
+---
+
+# VALIDATION
+
+Generate verification queries:
+
+`sql
+select *
+from pg_policies
+order by tablename;
+`
+
+and:
+
+`sql
+select
+tablename,
+rowsecurity
+from pg_tables
+where schemaname = 'public';
+`
+
+Expected:
+
+`text
+✓ RLS enabled everywhere
+
+✓ Shared datasets readable
+
+✓ Shared datasets admin-managed
+
+✓ Student data isolated
+
+✓ No policy dependency errors
+
+✓ Policies compile successfully
+`
+
+After RLS is confirmed working, the next phase should be:
+
+`text
+Phase 4 — Storage Buckets
+
+avatars
+institution-logos
+organization-logos
+logbook-files
+report-exports
+
+Phase 5 — Storage Policies
+
+Phase 6 — Paystack Integration Layer
+
+Phase 7 — Report Generation Engine
+
+Phase 8 — Live Preview Engine
+``
+
+This sequence minimizes security and migration issues.
+
+
+The next phase is **Storage Architecture**, but before creating buckets, I would make one design adjustment specific to Vemiq.
+
+## Current Vemiq Storage Needs
+
+Students can upload:
+
+``text
+Profile pictures
+
+Institution logos (admin)
+
+Organization logos (admin)
+
+Logbook images
+
+Logbook audio recordings
+
+Generated report PDFs
+
+Temporary AI processing files
+`
+
+Most people create too many buckets. That becomes difficult to maintain.
+
+---
+
+# Recommended Bucket Structure
+
+## avatars
+
+Purpose:
+
+`text
+User profile pictures
+`
+
+Access:
+
+`text
+User owns their avatar
+
+Public read allowed
+`
+
+---
+
+## institution-assets
+
+Purpose:
+
+`text
+Institution logos
+
+Institution branding assets
+`
+
+Examples:
+
+`text
+Edo State University logo
+
+UNIBEN logo
+
+UNILAG logo
+`
+
+Access:
+
+`text
+Public read
+
+Admin write
+`
+
+---
+
+## organization-assets
+
+Purpose:
+
+`text
+Training organization logos
+
+Company branding assets
+`
+
+Examples:
+
+`text
+NNPC logo
+
+NITDA logo
+
+Shell logo
+`
+
+Access:
+
+`text
+Public read
+
+Admin write
+`
+
+---
+
+## logbook-files
+
+Purpose:
+
+`text
+Logbook images
+
+Logbook audio recordings
+
+Evidence uploads
+`
+
+Examples:
+
+`text
+week1-photo.jpg
+
+maintenance-audio.mp3
+
+transformer-installation.png
+`
+
+Access:
+
+`text
+Owner only
+`
+
+This bucket is the most important one.
+
+---
+
+## report-exports
+
+Purpose:
+
+`text
+Generated PDFs
+
+Paid report downloads
+`
+
+Access:
+
+`text
+Owner only
+`
+
+---
+
+# Recommended Folder Structure
+
+Inside logbook-files:
+
+`text
+logbook-files/
+
+  user-id/
+
+      logbook-id/
+
+          week-1/
+
+          week-2/
+
+          week-3/
+`
+
+Example:
+
+`text
+logbook-files/
+
+  5ab3.../
+
+      1ca2.../
+
+          week-1/image1.jpg
+
+          week-1/audio1.mp3
+`
+
+---
+
+# Recommended PDF Structure
+
+`text
+report-exports/
+
+   user-id/
+
+      report-id/
+
+          v1.pdf
+
+          v2.pdf
+
+          final.pdf
+`
+
+This supports future versioning.
+
+---
+
+# One More Table Before Storage
+
+Looking at the current Vemiq schema, I would add:
+
+## report_exports
+
+`sql
+create table public.report_exports (
+    id uuid primary key default gen_random_uuid(),
+
+    report_id uuid not null
+        references public.reports(id)
+        on delete cascade,
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    storage_path text not null,
+
+    version_number integer not null,
+
+    created_at timestamptz not null default now()
+);
+`
+
+Reason:
+
+`text
+Without this table you won't know:
+
+Which PDFs exist
+
+Which version is current
+
+Which export belongs to which report
+
+How many times a report was exported
+`
+
+This becomes very useful later when users regenerate reports.
+
+---
+
+# Phase 4 Execution Prompt for Windsurf
+
+Tell Windsurf to:
+
+`text
+1. Create buckets only.
+
+avatars
+
+institution-assets
+
+organization-assets
+
+logbook-files
+
+report-exports
+`
+
+and
+
+`text
+2. Create report_exports table
+`
+
+but **do not create storage policies yet**.
+
+Storage policies should be a separate phase because they depend on your RLS strategy and ownership model.
+
+After this, the next phase becomes:
+
+`text
+Phase 5
+Storage Policies
+
+Phase 6
+Paystack Integration
+
+Phase 7
+Report Generation Engine
+
+Phase 8
+Live Preview Engine
+
+Phase 9
+AI Chat Editing System
+``
+
+Of those, the most critical for Vemiq's core value is actually **Phase 7 (Report Generation Engine)**, because that's where the chapter-by-chapter AI workflow gets implemented.
+
+
+The next phase should be **Storage Policies**, not Paystack or AI yet.
+
+Reason:
+
+``text
+Database
+✓
+
+Functions
+✓
+
+Triggers
+✓
+
+RLS
+✓
+
+Storage Buckets
+✓
+
+Storage Policies
+← Next
+
+Paystack
+Later
+
+AI Generation
+Later
+`
+
+If storage policies are not configured correctly, users may be able to:
+
+`text
+View another student's report PDF
+
+View another student's logbook photos
+
+Access another student's audio recordings
+
+Overwrite another student's uploads
+`
+
+So storage security comes first.
+
+---
+
+# WINDSURF PROMPT — VEMIQ STORAGE POLICIES
+
+You are a Senior Supabase Security Engineer.
+
+Objective:
+
+Create secure storage policies for all Vemiq buckets.
+
+Requirements:
+
+`text
+✓ Do not modify tables
+
+✓ Do not modify RLS
+
+✓ Do not modify functions
+
+✓ Do not recreate buckets
+
+✓ Storage policies only
+
+✓ Use auth.uid()
+
+✓ Production-ready
+`
+
+---
+
+# BUCKET 1 — avatars
+
+Purpose:
+
+`text
+User profile photos
+`
+
+Rules:
+
+`text
+Anyone can view avatars
+
+Authenticated users can upload
+
+Users can update own avatar
+
+Users can delete own avatar
+`
+
+Expected path structure:
+
+`text
+avatars/{user_id}/avatar.jpg
+`
+
+Ownership check:
+
+`sql
+(split_part(name, '/', 1) = auth.uid()::text)
+`
+
+Policies:
+
+`text
+SELECT
+INSERT
+UPDATE
+DELETE
+`
+
+---
+
+# BUCKET 2 — institution-assets
+
+Purpose:
+
+`text
+Institution logos
+`
+
+Rules:
+
+`text
+Public read
+
+Admin write only
+`
+
+Policies:
+
+`text
+SELECT for everyone
+
+INSERT admin
+
+UPDATE admin
+
+DELETE admin
+`
+
+Use:
+
+`sql
+public.is_admin()
+`
+
+---
+
+# BUCKET 3 — organization-assets
+
+Purpose:
+
+`text
+Company logos
+`
+
+Rules:
+
+`text
+Public read
+
+Admin write only
+`
+
+Policies:
+
+`text
+SELECT
+
+INSERT
+
+UPDATE
+
+DELETE
+`
+
+Admin-only write access.
+
+---
+
+# BUCKET 4 — logbook-files
+
+Purpose:
+
+`text
+Images
+
+Audio
+
+Evidence files
+`
+
+Path structure:
+
+`text
+logbook-files/
+
+user-id/
+
+    logbook-id/
+
+        week-1/
+
+        week-2/
+`
+
+Example:
+
+`text
+logbook-files/
+
+4c8d.../
+
+    1ab2.../
+
+        image.jpg
+`
+
+Rules:
+
+`text
+Only owner can access.
+`
+
+Ownership:
+
+`sql
+split_part(name, '/', 1)
+=
+auth.uid()::text
+`
+
+Policies:
+
+`text
+SELECT
+
+INSERT
+
+UPDATE
+
+DELETE
+`
+
+Owner only.
+
+---
+
+# BUCKET 5 — report-exports
+
+Purpose:
+
+`text
+Generated PDFs
+`
+
+Path:
+
+`text
+report-exports/
+
+user-id/
+
+    report-id/
+
+        final.pdf
+`
+
+Rules:
+
+`text
+Only owner can access.
+`
+
+Ownership:
+
+`sql
+split_part(name, '/', 1)
+=
+auth.uid()::text
+`
+
+Policies:
+
+`text
+SELECT
+
+INSERT
+
+UPDATE
+
+DELETE
+`
+
+Owner only.
+
+---
+
+# VALIDATION QUERIES
+
+Generate SQL to verify:
+
+`sql
+select *
+from storage.policies;
+`
+
+and
+
+`sql
+select *
+from storage.buckets;
+`
+
+---
+
+# SUCCESS CRITERIA
+
+`text
+✓ Avatars publicly viewable
+
+✓ Institution logos publicly viewable
+
+✓ Organization logos publicly viewable
+
+✓ Students cannot access another student's uploads
+
+✓ Students cannot access another student's PDFs
+
+✓ Admins manage shared assets
+
+✓ Storage ownership enforced
+
+✓ Policies compile successfully
+`
+
+---
+
+# AFTER STORAGE POLICIES
+
+The next major phase should be:
+
+## Phase 6 — Paystack Integration Layer
+
+Create:
+
+`text
+payments table integration
+
+payment verification endpoint
+
+webhook handler
+
+successful payment sync
+
+failed payment handling
+
+download authorization
+`
+
+Then:
+
+## Phase 7 — Vemiq Report Engine
+
+This is the most important system in the entire product.
+
+It includes:
+
+`text
+Create Report
+
+Generate Chapter
+
+Generate Section
+
+Regenerate Section
+
+Link Logbook Entries
+
+Use Organization Knowledge
+
+Version Snapshots
+
+Report Progress Tracking
+`
+
+And enforce the core Vemiq rule:
+
+`text
+NEVER generate an entire report.
+
+Generate:
+
+Chapter
+→ Section
+→ Subsection
+
+only.
+``
+
+That report engine is where Vemiq's real competitive advantage will live.
+
+
+Now we should move to **Phase 6 — Paystack Integration Layer**.
+
+This phase is extremely important because Vemiq's revenue model depends on controlling access to PDF exports.
+
+A mistake many founders make is:
+
+``text
+Generate PDF
+↓
+Ask for payment
+`
+
+That is backwards.
+
+Vemiq should work like:
+
+`text
+Generate Report
+↓
+Live Preview Available
+↓
+User Satisfied
+↓
+Paystack Payment
+↓
+Verify Payment
+↓
+Generate PDF
+↓
+Store PDF
+↓
+Allow Download
+`
+
+The PDF itself becomes the paid product.
+
+---
+
+# Before Building Paystack
+
+I recommend improving the payments system slightly.
+
+Your current payments table is good, but not complete enough for production.
+
+Add:
+
+`sql
+alter table public.payments
+add column paystack_reference text unique;
+
+alter table public.payments
+add column paystack_transaction_id bigint;
+
+alter table public.payments
+add column paid_at timestamptz;
+
+alter table public.payments
+add column gateway_response text;
+
+alter table public.payments
+add column metadata jsonb;
+`
+
+---
+
+# Add Export Authorization Table
+
+One payment may unlock multiple downloads.
+
+Create:
+
+`sql
+create table public.report_access (
+
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    report_id uuid not null
+        references public.reports(id)
+        on delete cascade,
+
+    payment_id uuid not null
+        references public.payments(id)
+        on delete cascade,
+
+    unlocked_at timestamptz not null default now(),
+
+    expires_at timestamptz,
+
+    unique(user_id, report_id)
+);
+`
+
+Purpose:
+
+`text
+Did user pay?
+
+Can user download?
+
+Has access expired?
+
+Which payment unlocked report?
+`
+
+---
+
+# WINDSURF PROMPT — PHASE 6 PAYSTACK
+
+You are a Senior Full Stack Engineer and Paystack Integration Specialist.
+
+Implement the entire Vemiq payment architecture.
+
+Requirements:
+
+`text
+Use Paystack
+
+Use Supabase
+
+Do not bypass payment verification
+
+Server-side verification only
+
+Never trust frontend payment success
+
+Production-ready
+`
+
+---
+
+# STEP 1 — PAYMENT INITIALIZATION
+
+When user clicks:
+
+`text
+Download PDF
+`
+
+Backend:
+
+`text
+Create payment record
+
+status = pending
+
+Generate Paystack transaction
+
+Return authorization URL
+`
+
+---
+
+# STEP 2 — PAYMENT CALLBACK
+
+Create endpoint:
+
+`text
+/api/payments/callback
+`
+
+Flow:
+
+`text
+Paystack redirect
+↓
+Receive reference
+↓
+Verify with Paystack API
+↓
+Update database
+`
+
+Never mark payment successful without verification.
+
+---
+
+# STEP 3 — WEBHOOK HANDLER
+
+Create:
+
+`text
+/api/payments/webhook
+`
+
+Validate:
+
+`text
+Paystack signature
+`
+
+Handle:
+
+`text
+charge.success
+
+charge.failed
+`
+
+---
+
+# STEP 4 — SUCCESSFUL PAYMENT
+
+When verified:
+
+Update:
+
+`text
+payments.status = successful
+
+paid_at = now()
+`
+
+Create:
+
+`text
+report_access
+`
+
+record.
+
+---
+
+# STEP 5 — FAILED PAYMENT
+
+Update:
+
+`text
+payments.status = failed
+`
+
+Store:
+
+`text
+gateway_response
+`
+
+---
+
+# STEP 6 — DOWNLOAD GUARD
+
+Before PDF generation:
+
+Check:
+
+`sql
+report_access exists
+`
+
+If:
+
+`text
+No access
+`
+
+return:
+
+`text
+Payment Required
+`
+
+---
+
+# STEP 7 — PDF EXPORT FLOW
+
+After payment:
+
+`text
+Generate HTML
+↓
+Generate PDF
+↓
+Upload to report-exports bucket
+↓
+Create report_exports row
+↓
+Return download URL
+`
+
+---
+
+# STEP 8 — DUPLICATE PAYMENT PROTECTION
+
+If user already owns:
+
+`text
+report_access
+`
+
+Do NOT charge again.
+
+Instead:
+
+`text
+Return existing PDF
+`
+
+or
+
+`text
+Generate latest version
+`
+
+depending on business logic.
+
+---
+
+# STEP 9 — ADMIN REPORTING
+
+Create dashboard queries for:
+
+`text
+Total Revenue
+
+Successful Payments
+
+Failed Payments
+
+Average Revenue Per User
+
+Reports Exported
+`
+
+---
+
+# SUCCESS CRITERIA
+
+`text
+✓ Payment initialized
+
+✓ Payment verified
+
+✓ Webhook secured
+
+✓ Payment recorded
+
+✓ Report unlocked
+
+✓ PDF generation protected
+
+✓ Duplicate charges prevented
+
+✓ Revenue data available
+`
+
+---
+
+# AFTER PAYSTACK
+
+The next phase is the most important phase in all of Vemiq:
+
+# Phase 7 — Report Generation Engine
+
+This is where we implement:
+
+`text
+Logbook → AI Context
+
+Organization Knowledge → AI Context
+
+Institution Data → AI Context
+
+Chapter-by-Chapter Generation
+
+Section-by-Section Generation
+
+Version Snapshots
+
+Progress Tracking
+
+Live Preview Synchronization
+`
+
+And enforce Vemiq's core rule:
+
+`text
+Never generate an entire report.
+
+Generate only:
+
+Chapter
+→ Section
+→ Subsection
+``
+
+This phase is what transforms Vemiq from a document storage app into an AI-powered SIWES/SWEP operating system.
+
+
+Now we're entering the phase that will determine whether Vemiq becomes a valuable product or just another AI wrapper.
+
+# Before We Execute Phase 7
+
+There is one architectural decision I strongly recommend:
+
+## Do NOT let the AI write directly into report_sections 
+
+Bad architecture:
+
+``text
+AI
+ ↓
+Writes directly into report_sections
+`
+
+If generation fails, hallucinates, or produces poor content, you lose control.
+
+Instead:
+
+`text
+AI
+ ↓
+Draft Output
+ ↓
+User Review
+ ↓
+Accept
+ ↓
+Save to report_sections
+`
+
+This gives students control and reduces accidental report corruption.
+
+---
+
+# Another Critical Recommendation
+
+Right now your database has:
+
+`text
+reports
+report_sections
+report_versions
+`
+
+I would add:
+
+## report_generation_jobs
+
+This becomes the heart of the AI engine.
+
+`sql
+create type generation_status as enum (
+    'pending',
+    'processing',
+    'completed',
+    'failed'
+);
+
+create table public.report_generation_jobs (
+
+    id uuid primary key default gen_random_uuid(),
+
+    report_id uuid not null
+        references public.reports(id)
+        on delete cascade,
+
+    section_id uuid not null
+        references public.report_sections(id)
+        on delete cascade,
+
+    user_id uuid not null
+        references auth.users(id)
+        on delete cascade,
+
+    status generation_status not null default 'pending',
+
+    prompt jsonb,
+
+    generated_content text,
+
+    error_message text,
+
+    created_at timestamptz not null default now(),
+
+    completed_at timestamptz
+);
+`
+
+Why?
+
+Because you need to track:
+
+`text
+Which section is generating
+
+Generation failures
+
+Retries
+
+Usage analytics
+
+Future queueing
+`
+
+Without this table, debugging AI issues becomes painful.
+
+---
+
+# WINDSURF PROMPT — PHASE 7 REPORT GENERATION ENGINE
+
+You are a Senior AI Systems Architect, Full Stack Engineer, Product Architect, and Supabase Engineer.
+
+Build the complete Vemiq Report Generation Engine.
+
+Core Rule:
+
+`text
+The AI must NEVER generate an entire report.
+
+The AI must NEVER generate multiple chapters.
+
+The AI must ONLY generate:
+
+One Chapter
+or
+One Section
+or
+One Subsection
+
+at a time.
+`
+
+---
+
+# STEP 1 — Create Generation Jobs System
+
+Create:
+
+`text
+generation_status enum
+
+report_generation_jobs table
+`
+
+Purpose:
+
+`text
+Track every AI generation request.
+`
+
+---
+
+# STEP 2 — Build Report Creation Workflow
+
+When user clicks:
+
+`text
+Create Report
+`
+
+Create:
+
+`text
+reports row
+`
+
+Then automatically generate default sections.
+
+---
+
+# SWEP Structure
+
+`text
+Chapter 1
+Introduction
+
+Chapter 2
+Description of Organization
+
+Chapter 3
+Activities Carried Out
+
+Chapter 4
+Challenges and Lessons Learned
+
+Chapter 5
+Conclusion
+`
+
+---
+
+# SIWES Structure
+
+`text
+Chapter 1
+Introduction
+
+Chapter 2
+Organization Profile
+
+Chapter 3
+Work Performed
+
+Chapter 4
+Observations and Challenges
+
+Chapter 5
+Conclusion and Recommendations
+`
+
+Store inside:
+
+`text
+report_sections
+`
+
+---
+
+# STEP 3 — Build Context Engine
+
+Before every AI call:
+
+Collect:
+
+`text
+Student profile
+
+Institution
+
+Faculty
+
+Department
+
+Matric number
+
+Coordinator name
+
+Supervisor name
+
+Training organization
+
+Organization knowledge
+
+Selected logbook entries
+
+Existing report sections
+`
+
+Create:
+
+`text
+buildReportContext()
+`
+
+Function.
+
+The AI should never rely solely on the user's message.
+
+---
+
+# STEP 4 — Logbook Linking
+
+User opens:
+
+`text
+Generate Section
+`
+
+Allow:
+
+`text
+Select all entries
+
+Select date range
+
+Select week range
+
+Select individual entries
+`
+
+Store selection in:
+
+`text
+report_logbook_entries
+`
+
+---
+
+# STEP 5 — Section Generation API
+
+Create backend action:
+
+`text
+generateSection()
+`
+
+Flow:
+
+`text
+Fetch report
+
+Fetch section
+
+Fetch profile
+
+Fetch institution
+
+Fetch organization
+
+Fetch organization knowledge
+
+Fetch linked logbook entries
+
+Build AI context
+
+Generate content
+
+Save to report_generation_jobs.generated_content
+
+Return draft
+`
+
+Do NOT automatically save to report_sections.
+
+---
+
+# STEP 6 — Review Layer
+
+Student sees:
+
+`text
+Generated Draft
+`
+
+Options:
+
+`text
+Accept
+
+Edit
+
+Regenerate
+`
+
+Only after:
+
+`text
+Accept
+`
+
+save into:
+
+`text
+report_sections.content
+`
+
+---
+
+# STEP 7 — Regeneration System
+
+When user clicks:
+
+`text
+Regenerate
+`
+
+Create:
+
+`text
+report_versions snapshot
+`
+
+before replacing content.
+
+---
+
+# STEP 8 — Chat Editing Engine
+
+The chat must operate on:
+
+`text
+Current section only
+`
+
+Example:
+
+`text
+Rewrite this section.
+
+Make this more professional.
+
+Expand paragraph two.
+`
+
+Never:
+
+`text
+Rewrite entire report.
+`
+
+---
+
+# STEP 9 — Progress Automation
+
+Use existing:
+
+`text
+calculate_report_progress()
+
+refresh_report_progress()
+`
+
+Progress updates automatically.
+
+---
+
+# STEP 10 — AI Safety Rules
+
+Hard-code:
+
+### Rule 1
+
+`text
+Never generate entire report.
+`
+
+### Rule 2
+
+`text
+Never generate multiple chapters.
+`
+
+### Rule 3
+
+`text
+Only generate requested section.
+`
+
+### Rule 4
+
+`text
+Prioritize logbook data.
+`
+
+### Rule 5
+
+`text
+Prioritize organization knowledge.
+`
+
+### Rule 6
+
+`text
+Use institution-specific formatting rules when available.
+`
+
+### Rule 7
+
+`text
+Prefer real data over assumptions.
+`
+
+---
+
+# STEP 11 — Analytics
+
+Track:
+
+`text
+Generation Count
+
+Regeneration Count
+
+Sections Completed
+
+Average Generation Time
+
+Failed Generations
+`
+
+using:
+
+`text
+report_generation_jobs
+`
+
+---
+
+# SUCCESS CRITERIA
+
+`text
+✓ Report created
+
+✓ Default chapters generated
+
+✓ Logbook entries linked
+
+✓ Context builder works
+
+✓ AI generates one section only
+
+✓ Draft review exists
+
+✓ Accept flow works
+
+✓ Regeneration works
+
+✓ Version snapshots created
+
+✓ Progress updates automatically
+
+✓ Analytics tracked
+
+✓ Entire-report generation impossible
+`
+
+---
+
+# After Phase 7
+
+The next phase should be:
+
+## Phase 8 — Live Preview Engine
+
+This is where Vemiq starts feeling premium.
+
+Architecture:
+
+`text
+Database
+ ↓
+HTML Renderer
+ ↓
+A4 Preview
+ ↓
+Real-Time Updates
+`
+
+Not:
+
+`text
+Database
+ ↓
+Generate PDF every time
+``
+
+The preview should be the source of truth, and PDF generation should happen only after payment and export. This aligns with your original vision of a live A4 report preview that updates as sections are generated or edited.
