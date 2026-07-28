@@ -37,8 +37,14 @@ export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
       width: '100%',
       maxWidth: sizeMap[size],
       margin: centered ? '0 auto' : '0',
-      padding: `0 ${spacing.md}`,
+      padding: `0 ${spacing.sm}`,
       ...style,
+      '@media (min-width: 640px)': {
+        padding: `0 ${spacing.md}`,
+      },
+      '@media (min-width: 1024px)': {
+        padding: `0 ${spacing.lg}`,
+      },
     };
 
     return (

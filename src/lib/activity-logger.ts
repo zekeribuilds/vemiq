@@ -20,7 +20,7 @@ export interface ActivityEvent {
 }
 
 /**
- * Log an activity event to the activity_events table
+ * Log an activity event to the activity_logs table
  * This provides a unified activity feed across the application
  */
 export async function logActivityEvent(event: ActivityEvent) {
@@ -34,14 +34,16 @@ export async function logActivityEvent(event: ActivityEvent) {
     }
 
     const { data, error } = await supabase
-      .from('activity_events')
+      .from('activity_logs')
       .insert({
         user_id: user.id,
-        event_type: event.event_type,
-        event_title: event.event_title,
-        event_description: event.event_description || null,
-        report_id: event.report_id || null,
-        event_metadata: event.event_metadata || {},
+        action: event.event_type,
+        metadata: {
+          title: event.event_title,
+          description: event.event_description || null,
+          report_id: event.report_id || null,
+          ...(event.event_metadata || {}),
+        },
       })
       .select()
       .single();

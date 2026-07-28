@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const userId = formData.get('userId') as string;
-    const reportId = formData.get('reportId') as string | null;
+    const linkedTo = formData.get('linkedTo') as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -81,11 +81,9 @@ export async function POST(request: NextRequest) {
       .from('uploads')
       .insert({
         user_id: userId,
-        report_id: reportId || null,
+        file_url: publicUrlData.publicUrl,
         file_type: fileType,
-        storage_path: fileName,
-        mime_type: file.type,
-        file_size: file.size,
+        linked_to: linkedTo || null,
       })
       .select()
       .single();
@@ -102,15 +100,15 @@ export async function POST(request: NextRequest) {
 
     // Log activity event
     const { error: activityError } = await supabase
-      .from('activity_events')
+      .from('activity_logs')
       .insert({
         user_id: userId,
-        report_id: reportId || null,
-        event_type: 'upload',
-        event_data: {
+        action: 'upload',
+        metadata: {
           file_type: fileType,
           file_name: file.name,
           file_size: file.size,
+          linked_to: linkedTo,
         },
       });
 
@@ -122,7 +120,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       id: uploadRecord.id,
       url: publicUrlData.publicUrl,
-      storage_path: fileName,
+      linked_to: uploadRecord.linked_to,
       file_type: fileType,
       mime_type: file.type,
       file_size: file.size,
@@ -167,10 +165,18 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const storagePath = uploadRecord.file_url.split('/uploads/').pop();
+    if (!storagePath) {
+      return NextResponse.json(
+        { error: 'Stored file path could not be resolved' },
+        { status: 500 }
+      );
+    }
+
     // Delete from storage
     const { error: storageError } = await supabase.storage
       .from('uploads')
-      .remove([uploadRecord.storage_path]);
+      .remove([storagePath]);
 
     if (storageError) {
       console.error('Storage deletion error:', storageError);
@@ -197,14 +203,13 @@ export async function DELETE(request: NextRequest) {
 
     // Log activity event
     const { error: activityError } = await supabase
-      .from('activity_events')
+      .from('activity_logs')
       .insert({
         user_id: userId,
-        report_id: uploadRecord.report_id,
-        event_type: 'delete_upload',
-        event_data: {
+        action: 'delete_upload',
+        metadata: {
           file_type: uploadRecord.file_type,
-          storage_path: uploadRecord.storage_path,
+          file_url: uploadRecord.file_url,
         },
       });
 

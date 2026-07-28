@@ -37,11 +37,8 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
           .from('reports')
           .select(`
             *,
-            report_metadata(*),
             institution:institutions(name),
-            faculty:faculties(name),
-            department:departments(name),
-            organization:organizations(name)
+            training_organization:training_organizations(name)
           `)
           .eq('id', params.id)
           .single();
@@ -54,7 +51,7 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
           .from('report_sections')
           .select('*')
           .eq('report_id', params.id)
-          .order('sort_order', { ascending: true });
+          .order('section_order', { ascending: true });
 
         if (sectionsError) throw sectionsError;
         setSections(sectionsData || []);
@@ -66,13 +63,13 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
 
         // Fetch weekly logs
         const { data: logsData, error: logsError } = await supabase
-          .from('weekly_logs')
-          .select('*')
+          .from('report_logbook_entries')
+          .select('entry:logbook_entries(*)')
           .eq('report_id', params.id)
-          .order('week_number', { ascending: true });
+          .order('created_at', { ascending: true });
 
         if (logsError) throw logsError;
-        setWeeklyLogs(logsData || []);
+        setWeeklyLogs((logsData || []).map((item: any) => item.entry).filter(Boolean));
       } catch (error) {
         console.error('Error fetching report:', error);
       } finally {
@@ -210,35 +207,11 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
                         </div>
                         <div>
                           <label className="text-sm text-muted-foreground">Progress</label>
-                          <p className="text-foreground font-semibold">{reportData?.progress_percentage || 0}%</p>
+                          <p className="text-foreground font-semibold">{reportData?.progress || 0}%</p>
                         </div>
                       </div>
                     </div>
                   </Card>
-
-                  {reportData?.report_metadata && (
-                    <Card className="p-6">
-                      <h3 className="text-lg font-bold text-foreground mb-4">Student Information</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm text-muted-foreground">Student Name</label>
-                          <p className="text-foreground">{reportData.report_metadata.student_name || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm text-muted-foreground">Matric Number</label>
-                          <p className="text-foreground">{reportData.report_metadata.matric_number || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm text-muted-foreground">Academic Level</label>
-                          <p className="text-foreground">{reportData.report_metadata.academic_level || 'N/A'}</p>
-                        </div>
-                        <div>
-                          <label className="text-sm text-muted-foreground">Academic Session</label>
-                          <p className="text-foreground">{reportData.report_metadata.academic_session || 'N/A'}</p>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
 
                   <Card className="p-6">
                     <h3 className="text-lg font-bold text-foreground mb-4">Organization Details</h3>
@@ -248,16 +221,8 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
                         <p className="text-foreground">{reportData?.institution?.name || 'N/A'}</p>
                       </div>
                       <div>
-                        <label className="text-sm text-muted-foreground">Faculty</label>
-                        <p className="text-foreground">{reportData?.faculty?.name || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm text-muted-foreground">Department</label>
-                        <p className="text-foreground">{reportData?.department?.name || 'N/A'}</p>
-                      </div>
-                      <div>
                         <label className="text-sm text-muted-foreground">Training Organization</label>
-                        <p className="text-foreground">{reportData?.organization?.name || 'N/A'}</p>
+                        <p className="text-foreground">{reportData?.training_organization?.name || 'N/A'}</p>
                       </div>
                     </div>
                   </Card>
@@ -267,11 +232,11 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
                     <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
                       <div 
                         className="bg-primary h-4 rounded-full transition-all duration-300"
-                        style={{ width: `${reportData?.progress_percentage || 0}%` }}
+                        style={{ width: `${reportData?.progress || 0}%` }}
                       />
                     </div>
                     <p className="text-sm text-muted-foreground text-center">
-                      {reportData?.progress_percentage || 0}% Complete
+                      {reportData?.progress || 0}% Complete
                     </p>
                   </Card>
                 </div>
@@ -406,27 +371,19 @@ export default function ReportEditorPage({ params }: { params: { id: string } })
                         <Card key={log.id} className="p-6">
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold text-foreground">
-                              Week {log.week_number}
+                              Week {log.week_number || 'N/A'}
                             </h3>
                             <span className={`px-3 py-1 rounded-full text-sm ${
-                              log.status === 'completed' ? 'bg-green-100 text-green-700' :
-                              log.status === 'in_progress' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-gray-100 text-gray-700'
                             }`}>
-                              {log.status}
+                              {log.source_type || 'entry'}
                             </span>
                           </div>
                           {log.title && (
                             <p className="text-foreground font-medium mb-2">{log.title}</p>
                           )}
-                          {log.description && (
-                            <p className="text-gray-600 mb-4">{log.description}</p>
-                          )}
-                          {log.summary && (
-                            <div className="p-4 bg-primary/5 rounded-lg">
-                              <p className="text-sm text-muted-foreground mb-1">AI Summary</p>
-                              <p className="text-sm text-foreground">{log.summary}</p>
-                            </div>
+                          {log.activity_description && (
+                            <p className="text-gray-600 mb-4">{log.activity_description}</p>
                           )}
                         </Card>
                       ))}

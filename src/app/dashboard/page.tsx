@@ -21,16 +21,12 @@ export default function DashboardPage() {
     institution: string | null;
     faculty: string | null;
     department: string | null;
-    currentLevel: string | null;
   } | null>(null);
 
   const [currentTraining, setCurrentTraining] = useState<{
     programType: string;
     institution: string | null;
-    department: string | null;
     organization: string | null;
-    startDate: string | null;
-    endDate: string | null;
     currentChapter: string | null;
     overallProgress: number;
     status: string;
@@ -69,7 +65,6 @@ export default function DashboardPage() {
               institution: typeof profileData.institution === 'string' ? profileData.institution : profileData.institution?.name || null,
               faculty: typeof profileData.faculty === 'string' ? profileData.faculty : profileData.faculty?.name || null,
               department: typeof profileData.department === 'string' ? profileData.department : profileData.department?.name || null,
-              currentLevel: profileData.current_level || null,
             });
           }
         }
@@ -77,34 +72,34 @@ export default function DashboardPage() {
         // Fetch reports
         const { data: reportsData, error: reportsError } = await supabase
           .from('reports')
-          .select('*')
+          .select(`
+            *,
+            institution:institutions(name),
+            training_organization:training_organizations(name)
+          `)
           .order('created_at', { ascending: false })
           .limit(5);
 
         if (!reportsError && reportsData) {
           setRecentReports(reportsData);
           
-          // Set current training from active report (not most recent)
-          const activeReport = reportsData.find(r => r.is_active === true);
+          const activeReport = reportsData[0];
           if (activeReport) {
             setCurrentTraining({
               programType: activeReport.report_type || 'SIWES',
-              institution: activeReport.institution || null,
-              department: activeReport.department || null,
-              organization: activeReport.organization || null,
-              startDate: activeReport.start_date || null,
-              endDate: activeReport.end_date || null,
-              currentChapter: activeReport.current_chapter || null,
+              institution: activeReport.institution?.name || null,
+              organization: activeReport.training_organization?.name || null,
+              currentChapter: null,
               overallProgress: activeReport.progress || 0,
               status: activeReport.status || 'Draft',
             });
           }
         }
 
-        // Fetch activities from activity_events table
+        // Fetch activities from activity_logs table
         if (user) {
           const { data: activitiesData, error: activitiesError } = await supabase
-            .from('activity_events')
+            .from('activity_logs')
             .select('*')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
@@ -113,9 +108,9 @@ export default function DashboardPage() {
           if (!activitiesError && activitiesData) {
             const mappedActivities = activitiesData.map((event: any) => ({
               id: event.id,
-              type: event.event_type,
-              title: event.event_title,
-              description: event.event_description || '',
+              type: event.action,
+              title: event.metadata?.title || event.action,
+              description: event.metadata?.description || '',
               time: new Date(event.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               date: new Date(event.created_at).toLocaleDateString(),
             }));
@@ -228,7 +223,6 @@ export default function DashboardPage() {
                   institution={userData.institution}
                   faculty={userData.faculty}
                   department={userData.department}
-                  currentLevel={userData.currentLevel}
                 />
               )}
             </>

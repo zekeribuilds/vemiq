@@ -17,6 +17,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
   const [loading, setLoading] = useState(true);
   const [week, setWeek] = useState<any>(null);
   const [dailyEntries, setDailyEntries] = useState<Record<string, string>>({});
+  const [summary, setSummary] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved');
   const [attachments, setAttachments] = useState<any[]>([]);
@@ -27,32 +28,45 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
       try {
         const supabase = createClient();
         
-        // Fetch week data
-        const { data: weekData, error: weekError } = await supabase
-          .from('weekly_logs')
+        const weekNumber = Number(params.weekId);
+
+        const { data: logbookData, error: logbookError } = await supabase
+          .from('logbooks')
           .select('*')
-          .eq('id', params.weekId)
+          .eq('id', params.id)
           .single();
 
-        if (weekError) throw weekError;
-        setWeek(weekData);
+        if (logbookError) throw logbookError;
+        setWeek({
+          id: params.weekId,
+          title: `Week ${weekNumber}`,
+          week_number: weekNumber,
+          status: logbookData.status,
+        });
 
-        // Initialize daily entries from description (stored as JSON)
-        if (weekData.description) {
-          try {
-            const entries = JSON.parse(weekData.description);
-            setDailyEntries(entries);
-          } catch {
-            setDailyEntries({});
-          }
-        }
+        const { data: entriesData, error: entriesError } = await supabase
+          .from('logbook_entries')
+          .select('*')
+          .eq('logbook_id', params.id)
+          .eq('week_number', weekNumber)
+          .order('entry_date', { ascending: true });
+
+        if (entriesError) throw entriesError;
+
+        const entriesByDay = (entriesData || []).reduce((acc: Record<string, string>, entry: any) => {
+          const day = DAYS.includes(entry.title) ? entry.title : DAYS[0];
+          acc[day] = entry.activity_description || '';
+          return acc;
+        }, {});
+
+        setDailyEntries(entriesByDay);
 
         // Fetch attachments
         const { data: uploadsData } = await supabase
           .from('uploads')
           .select('*')
-          .eq('report_id', params.id) // Using report_id to link to this logbook
-          .order('uploaded_at', { ascending: false });
+          .eq('linked_to', `${params.id}:week:${params.weekId}`)
+          .order('created_at', { ascending: false });
 
         setAttachments(uploadsData || []);
       } catch (error) {
@@ -76,15 +90,39 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
 
     try {
       const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const weekNumber = Number(params.weekId);
+
       const { error } = await supabase
-        .from('weekly_logs')
-        .update({ 
-          description: JSON.stringify(dailyEntries),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', params.weekId);
+        .from('logbook_entries')
+        .delete()
+        .eq('logbook_id', params.id)
+        .eq('week_number', weekNumber);
 
       if (error) throw error;
+
+      const entries = Object.entries(dailyEntries)
+        .filter(([, content]) => content.trim().length > 0)
+        .map(([day, content], index) => ({
+          logbook_id: params.id,
+          user_id: user.id,
+          entry_date: new Date(Date.now() + index * 86400000).toISOString().slice(0, 10),
+          week_number: weekNumber,
+          title: day,
+          activity_description: content,
+          source_type: 'text' as const,
+        }));
+
+      if (entries.length > 0) {
+        const { error: insertError } = await supabase
+          .from('logbook_entries')
+          .insert(entries);
+
+        if (insertError) throw insertError;
+      }
+
       setSaveStatus('saved');
     } catch (error) {
       console.error('Error saving entries:', error);
@@ -111,6 +149,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           weekId: params.weekId,
+          logbookId: params.id,
           dailyEntries,
         }),
       });
@@ -118,13 +157,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
       const data = await response.json();
       
       if (data.summary) {
-        const supabase = createClient();
-        await supabase
-          .from('weekly_logs')
-          .update({ summary: data.summary })
-          .eq('id', params.weekId);
-        
-        setWeek((prev: any) => ({ ...prev, summary: data.summary }));
+        setSummary(data.summary);
       }
     } catch (error) {
       console.error('Error generating summary:', error);
@@ -141,8 +174,7 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
       const formData = new FormData();
       formData.append('file', file);
       formData.append('userId', user.id);
-      formData.append('reportId', params.id);
-      formData.append('weeklyLogId', params.weekId);
+      formData.append('linkedTo', `${params.id}:week:${params.weekId}`);
       formData.append('fileType', file.type);
 
       const response = await fetch('/api/uploads', {
@@ -281,8 +313,8 @@ export default function WeekDetailPage({ params }: { params: { id: string; weekI
         <div className="space-y-4">
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">AI Summary</h3>
-            {week?.summary ? (
-              <p className="text-sm text-muted-foreground">{week.summary}</p>
+            {summary ? (
+              <p className="text-sm text-muted-foreground">{summary}</p>
             ) : (
               <p className="text-sm text-muted-foreground mb-4">No summary generated yet</p>
             )}

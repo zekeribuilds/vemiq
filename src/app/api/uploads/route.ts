@@ -7,8 +7,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const userId = formData.get('userId') as string;
-    const reportId = formData.get('reportId') as string;
-    const weeklyLogId = formData.get('weeklyLogId') as string;
+    const linkedTo = formData.get('linkedTo') as string | null;
     const fileType = formData.get('fileType') as string;
 
     if (!file || !userId) {
@@ -29,11 +28,9 @@ export async function POST(request: NextRequest) {
       .from('uploads')
       .insert({
         user_id: userId,
-        report_id: reportId || null,
-        file_name: file.name,
         file_url: publicUrl,
         file_type: fileType || file.type,
-        file_size: file.size,
+        linked_to: linkedTo || null,
       })
       .select()
       .single();
@@ -41,22 +38,27 @@ export async function POST(request: NextRequest) {
     if (uploadError) throw uploadError;
 
     // Create activity event
-    await supabase.from('activity_events').insert({
+    await supabase.from('activity_logs').insert({
       user_id: userId,
       action: 'upload',
-      entity_type: 'upload',
-      entity_id: uploadData.id,
       metadata: {
+        entity_type: 'upload',
+        entity_id: uploadData.id,
         fileName: file.name,
         fileType: fileType || file.type,
-        reportId,
-        weeklyLogId,
+        fileSize: file.size,
+        linkedTo,
       },
     });
 
     return NextResponse.json({
       success: true,
-      upload: uploadData,
+      upload: {
+        ...uploadData,
+        file_name: file.name,
+        file_size: file.size,
+        uploaded_at: uploadData.created_at,
+      },
     });
   } catch (error) {
     console.error('Upload error:', error);
@@ -91,10 +93,9 @@ export async function DELETE(request: NextRequest) {
 
     if (fetchError) throw fetchError;
 
-    // Delete from storage
-    const filePath = upload.file_url.split('/').pop();
-    if (filePath) {
-      await supabase.storage.from('uploads').remove([`${userId}/${filePath}`]);
+    const storagePath = upload.file_url.split('/uploads/').pop();
+    if (storagePath) {
+      await supabase.storage.from('uploads').remove([storagePath]);
     }
 
     // Delete from database
@@ -106,13 +107,13 @@ export async function DELETE(request: NextRequest) {
     if (deleteError) throw deleteError;
 
     // Create activity event
-    await supabase.from('activity_events').insert({
+    await supabase.from('activity_logs').insert({
       user_id: userId,
       action: 'delete',
-      entity_type: 'upload',
-      entity_id: uploadId,
       metadata: {
-        fileName: upload.file_name,
+        entity_type: 'upload',
+        entity_id: uploadId,
+        fileUrl: upload.file_url,
       },
     });
 

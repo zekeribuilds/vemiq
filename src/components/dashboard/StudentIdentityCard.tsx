@@ -7,7 +7,6 @@ interface StudentIdentityCardProps {
   institution: string | null;
   faculty: string | null;
   department: string | null;
-  currentLevel: string | null;
 }
 
 export default function StudentIdentityCard({
@@ -15,7 +14,6 @@ export default function StudentIdentityCard({
   institution,
   faculty,
   department,
-  currentLevel,
 }: StudentIdentityCardProps) {
   return (
     <Card className="rounded-2xl p-6">
@@ -23,9 +21,6 @@ export default function StudentIdentityCard({
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-1">{userName}</h2>
           <p className="text-sm text-muted-foreground">{institution || 'Not specified'}</p>
-        </div>
-        <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
-          <span className="text-xs font-medium text-primary">{currentLevel || 'Not specified'}</span>
         </div>
       </div>
 

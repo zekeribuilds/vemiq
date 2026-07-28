@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/browser';
 import PageContainer from '@/components/layout/PageContainer';
 import { SearchIcon, FilterIcon, CreateIcon, DocumentsIcon, MicIcon, CameraIcon, UploadIcon, ChevronRightIcon, XIcon } from '@/design-system';
-import { Button } from '@/design-system/components/Button';
 import { Input } from '@/design-system/components/Input';
-import { EmptyState } from '@/design-system/components/EmptyState';
+import { Button } from '@/design-system/components/Button';
 
 export default function DashboardLogbookPage() {
   const router = useRouter();
@@ -44,9 +43,11 @@ export default function DashboardLogbookPage() {
   };
 
   const filteredEntries = logbookEntries.filter((entry) => {
-    const matchesSearch = entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (entry.content && entry.content.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesFilter = activeFilter === 'all' || entry.entry_type === activeFilter;
+    const title = entry.title || '';
+    const description = entry.activity_description || '';
+    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = activeFilter === 'all' || entry.source_type === activeFilter;
     return matchesSearch && matchesFilter;
   });
 
@@ -55,19 +56,19 @@ export default function DashboardLogbookPage() {
       try {
         const supabase = createClient();
         const { data, error } = await supabase
-          .from('weekly_logs')
+          .from('logbook_entries')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('Error fetching weekly logs:', error);
+          console.error('Error fetching logbook entries:', error);
           setError(true);
         } else {
           setLogbookEntries(data || []);
         }
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching weekly logs:', err);
+        console.error('Error fetching logbook entries:', err);
         setError(true);
         setLoading(false);
       }
@@ -170,7 +171,7 @@ export default function DashboardLogbookPage() {
               className="card p-6 flex items-start gap-4 cursor-pointer hover:border-accent transition-colors"
             >
               <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                {getEntryIcon(entry.entry_type)}
+                {getEntryIcon(entry.source_type)}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-lg font-semibold text-foreground mb-1">
@@ -180,7 +181,7 @@ export default function DashboardLogbookPage() {
                   {new Date(entry.created_at).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-muted-foreground line-clamp-2">
-                  {entry.content?.substring(0, 150) || 'No content'}
+                  {entry.activity_description?.substring(0, 150) || 'No content'}
                 </p>
               </div>
               <ChevronRightIcon size={20} className="text-muted-foreground flex-shrink-0 mt-1" />

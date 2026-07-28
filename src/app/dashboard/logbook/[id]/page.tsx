@@ -21,28 +21,47 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
       try {
         const supabase = createClient();
         
-        // Fetch logbook (report)
-        const { data: reportData, error: reportError } = await supabase
-          .from('reports')
+        const { data: logbookData, error: logbookError } = await supabase
+          .from('logbooks')
           .select(`
             *,
-            report_metadata(*)
+            institution:institutions(name),
+            training_organization:training_organizations(name)
           `)
           .eq('id', params.id)
           .single();
 
-        if (reportError) throw reportError;
-        setLogbook(reportData);
+        if (logbookError) throw logbookError;
+        setLogbook(logbookData);
 
-        // Fetch weeks (weekly_logs)
-        const { data: weeksData, error: weeksError } = await supabase
-          .from('weekly_logs')
+        const { data: entriesData, error: entriesError } = await supabase
+          .from('logbook_entries')
           .select('*')
-          .eq('report_id', params.id)
+          .eq('logbook_id', params.id)
           .order('week_number', { ascending: true });
 
-        if (weeksError) throw weeksError;
-        setWeeks(weeksData || []);
+        if (entriesError) throw entriesError;
+
+        const groupedWeeks = Object.values(
+          (entriesData || []).reduce((acc: Record<string, any>, entry: any) => {
+            const weekNumber = entry.week_number || 1;
+            const key = String(weekNumber);
+            if (!acc[key]) {
+              acc[key] = {
+                id: key,
+                week_number: weekNumber,
+                title: `Week ${weekNumber}`,
+                status: 'active',
+                description: entry.activity_description,
+                entryCount: 0,
+              };
+            }
+            acc[key].entryCount += 1;
+            return acc;
+          }, {})
+        );
+
+        setWeeks(groupedWeeks);
       } catch (error) {
         console.error('Error fetching logbook:', error);
       } finally {
@@ -58,25 +77,49 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
 
     try {
       const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { error } = await supabase
-        .from('weekly_logs')
+        .from('logbook_entries')
         .insert({
-          report_id: params.id,
+          logbook_id: params.id,
+          user_id: user.id,
+          entry_date: new Date().toISOString().slice(0, 10),
           week_number: parseInt(newWeekNumber),
           title: `Week ${newWeekNumber}`,
-          status: 'in_progress',
+          activity_description: '',
+          source_type: 'text',
         });
 
       if (error) throw error;
 
       // Refresh weeks
       const { data: weeksData } = await supabase
-        .from('weekly_logs')
+        .from('logbook_entries')
         .select('*')
-        .eq('report_id', params.id)
+        .eq('logbook_id', params.id)
         .order('week_number', { ascending: true });
 
-      setWeeks(weeksData || []);
+      const groupedWeeks = Object.values(
+        (weeksData || []).reduce((acc: Record<string, any>, entry: any) => {
+          const weekNumber = entry.week_number || 1;
+          const key = String(weekNumber);
+          if (!acc[key]) {
+            acc[key] = {
+              id: key,
+              week_number: weekNumber,
+              title: `Week ${weekNumber}`,
+              status: 'active',
+              description: entry.activity_description,
+              entryCount: 0,
+            };
+          }
+          acc[key].entryCount += 1;
+          return acc;
+        }, {})
+      );
+      setWeeks(groupedWeeks);
       setNewWeekNumber('');
       setShowAddWeek(false);
     } catch (error) {
@@ -91,9 +134,10 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
     try {
       const supabase = createClient();
       const { error } = await supabase
-        .from('weekly_logs')
+        .from('logbook_entries')
         .delete()
-        .eq('id', weekId);
+        .eq('logbook_id', params.id)
+        .eq('week_number', Number(weekId));
 
       if (error) throw error;
 
@@ -128,7 +172,7 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
         </Button>
         <h1 className="text-3xl font-bold text-foreground mb-2">{logbook?.title || 'Logbook'}</h1>
         <p className="text-muted-foreground">
-          {logbook?.report_metadata?.academic_session || 'No session set'}
+          {logbook?.program_type || 'No program type set'}
         </p>
       </div>
 
@@ -190,10 +234,9 @@ export default function LogbookDetailPage({ params }: { params: { id: string } }
                     </h3>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       week.status === 'completed' ? 'bg-green-100 text-green-700' :
-                      week.status === 'in_progress' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-gray-100 text-gray-700'
                     }`}>
-                      {week.status}
+                      {week.entryCount} {week.entryCount === 1 ? 'entry' : 'entries'}
                     </span>
                   </div>
                   <div className="flex gap-2">

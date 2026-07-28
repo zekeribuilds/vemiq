@@ -13,7 +13,7 @@ export default function CreateLogbookPage() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    academicSession: '',
+    programType: 'SIWES' as 'SIWES' | 'SWEP',
     organization: '',
   });
 
@@ -29,32 +29,20 @@ export default function CreateLogbookPage() {
         throw new Error('User not authenticated');
       }
 
-      // Create a report that serves as the logbook
-      const { data: report, error: reportError } = await supabase
-        .from('reports')
+      const { data: logbook, error: logbookError } = await supabase
+        .from('logbooks')
         .insert({
           user_id: user.id,
           title: formData.name,
-          report_type: 'logbook',
-          status: 'draft',
-          progress_percentage: 0,
+          program_type: formData.programType,
+          department_name: formData.organization || null,
         })
         .select()
         .single();
 
-      if (reportError) throw reportError;
+      if (logbookError) throw logbookError;
 
-      // Create report metadata
-      const { error: metadataError } = await supabase
-        .from('report_metadata')
-        .insert({
-          report_id: report.id,
-          academic_session: formData.academicSession,
-        });
-
-      if (metadataError) throw metadataError;
-
-      router.push(`/dashboard/logbook/${report.id}`);
+      router.push(`/dashboard/logbook/${logbook.id}`);
     } catch (error) {
       console.error('Error creating logbook:', error);
       alert('Failed to create logbook. Please try again.');
@@ -83,10 +71,10 @@ export default function CreateLogbookPage() {
             />
 
             <Input
-              label="Academic Session"
-              placeholder="e.g., 2023/2024"
-              value={formData.academicSession}
-              onChange={(e) => setFormData({ ...formData, academicSession: e.target.value })}
+              label="Program Type"
+              placeholder="SIWES or SWEP"
+              value={formData.programType}
+              onChange={(e) => setFormData({ ...formData, programType: e.target.value.toUpperCase() === 'SWEP' ? 'SWEP' : 'SIWES' })}
               required
               fullWidth
             />

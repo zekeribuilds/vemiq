@@ -7,11 +7,12 @@ import { DownloadIcon, DeleteIcon, DocumentsIcon, CameraIcon, MicIcon, BookOpenI
 
 interface Attachment {
   id: string;
-  file_name: string;
+  file_name?: string;
   file_url: string;
-  file_type: string;
-  file_size: number;
-  uploaded_at: string;
+  file_type: string | null;
+  file_size?: number;
+  uploaded_at?: string;
+  created_at?: string;
 }
 
 interface AttachmentViewerProps {
@@ -27,7 +28,10 @@ export function AttachmentViewer({
 }: AttachmentViewerProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const getFileIcon = (fileType: string) => {
+  const getFileIcon = (fileType: string | null) => {
+    if (!fileType) {
+      return <DocumentsIcon size={24} className="text-gray-500" />;
+    }
     if (fileType.startsWith('image/')) {
       return <CameraIcon size={24} className="text-purple-500" />;
     }
@@ -40,10 +44,11 @@ export function AttachmentViewer({
     return <DocumentsIcon size={24} className="text-gray-500" />;
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return 'Unknown size';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const handleDelete = async (attachmentId: string) => {
@@ -71,44 +76,50 @@ export function AttachmentViewer({
 
   return (
     <div className="space-y-3">
-      {attachments.map((attachment) => (
-        <Card key={attachment.id} className="p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-              {getFileIcon(attachment.file_type)}
+      {attachments.map((attachment) => {
+        const fileName = attachment.file_name || attachment.file_url.split('/').pop() || 'Attachment';
+        const uploadedAt = attachment.uploaded_at || attachment.created_at;
+
+        return (
+          <Card key={attachment.id} className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                {getFileIcon(attachment.file_type)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-foreground truncate">{fileName}</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatFileSize(attachment.file_size)}
+                  {uploadedAt ? ` - ${new Date(uploadedAt).toLocaleDateString()}` : ''}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {onDownload && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDownload(attachment)}
+                    leftIcon={<DownloadIcon size={16} />}
+                  >
+                    Download
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(attachment.id)}
+                    isLoading={deletingId === attachment.id}
+                    leftIcon={<DeleteIcon size={16} />}
+                  >
+                    Delete
+                  </Button>
+                )}
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground truncate">{attachment.file_name}</p>
-              <p className="text-sm text-muted-foreground">
-                {formatFileSize(attachment.file_size)} • {new Date(attachment.uploaded_at).toLocaleDateString()}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              {onDownload && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDownload(attachment)}
-                  leftIcon={<DownloadIcon size={16} />}
-                >
-                  Download
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(attachment.id)}
-                  isLoading={deletingId === attachment.id}
-                  leftIcon={<DeleteIcon size={16} />}
-                >
-                  Delete
-                </Button>
-              )}
-            </div>
-          </div>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
     </div>
   );
 }

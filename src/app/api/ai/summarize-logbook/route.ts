@@ -4,61 +4,62 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { weekId, dailyEntries } = body;
+    const { weekId, logbookId, dailyEntries } = body;
 
-    if (!weekId) {
+    if (!weekId || !logbookId) {
       return NextResponse.json(
-        { error: 'weekId is required' },
+        { error: 'weekId and logbookId are required' },
         { status: 400 }
       );
     }
 
     const supabase = await createClient();
+    const weekNumber = Number(weekId);
 
-    // Fetch week data with related context
-    const { data: weekData, error: weekError } = await supabase
-      .from('weekly_logs')
+    const { data: logbookData, error: logbookError } = await supabase
+      .from('logbooks')
       .select(`
         *,
-        report:reports(
-          *,
-          report_metadata(*),
-          institution:institutions(name),
-          faculty:faculties(name),
-          department:departments(name),
-          organization:organizations(name)
-        )
+        institution:institutions(name),
+        training_organization:training_organizations(name)
       `)
-      .eq('id', weekId)
+      .eq('id', logbookId)
       .single();
 
-    if (weekError) throw weekError;
+    if (logbookError) throw logbookError;
+
+    const { data: entriesData, error: entriesError } = await supabase
+      .from('logbook_entries')
+      .select('*')
+      .eq('logbook_id', logbookId)
+      .eq('week_number', weekNumber)
+      .order('entry_date', { ascending: true });
+
+    if (entriesError) throw entriesError;
 
     // Fetch uploads/attachments for this week
     const { data: uploadsData } = await supabase
       .from('uploads')
       .select('*')
-      .eq('report_id', weekData.report_id)
-      .order('uploaded_at', { ascending: false });
+      .eq('linked_to', `${logbookId}:week:${weekId}`)
+      .order('created_at', { ascending: false });
 
     // Build context for AI
     const context = {
-      weekNumber: weekData.week_number,
-      dailyEntries,
-      report: {
-        title: weekData.report?.title,
-        type: weekData.report?.report_type,
-        institution: weekData.report?.institution?.name,
-        faculty: weekData.report?.faculty?.name,
-        department: weekData.report?.department?.name,
-        organization: weekData.report?.organization?.name,
-        studentLevel: weekData.report?.report_metadata?.academic_level,
-        academicSession: weekData.report?.report_metadata?.academic_session,
+      weekNumber,
+      dailyEntries: dailyEntries || Object.fromEntries(
+        (entriesData || []).map((entry: any) => [entry.title || entry.entry_date, entry.activity_description])
+      ),
+      logbook: {
+        title: logbookData.title,
+        type: logbookData.program_type,
+        institution: logbookData.institution?.name,
+        organization: logbookData.training_organization?.name,
       },
       attachments: uploadsData?.map(u => ({
-        fileName: u.file_name,
+        fileName: u.file_url.split('/').pop(),
         fileType: u.file_type,
-        uploadedAt: u.uploaded_at,
+        uploadedAt: u.created_at,
       })) || [],
     };
 
@@ -96,8 +97,8 @@ async function generateAISummary(context: any): Promise<string> {
   let summary = `Week ${context.weekNumber} Summary:\n\n`;
   summary += `Activities recorded on: ${daysWithEntries}\n\n`;
   
-  if (context.report?.organization) {
-    summary += `Training at ${context.report.organization}\n`;
+  if (context.logbook?.organization) {
+    summary += `Training at ${context.logbook.organization}\n`;
   }
   
   summary += `\nKey activities:\n`;

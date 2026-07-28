@@ -55,15 +55,16 @@ export async function trackEvent(event: AnalyticsEvent) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from('analytics_events').insert({
+    await supabase.from('activity_logs').insert({
       user_id: user.id,
-      event_type: event.eventType,
-      event_category: event.category,
-      event_name: event.eventType,
-      properties: event.properties || {},
-      page: event.page || window.location.pathname,
-      referrer: document.referrer,
-      user_agent: navigator.userAgent,
+      action: event.eventType,
+      metadata: {
+        category: event.category,
+        properties: event.properties || {},
+        page: event.page || window.location.pathname,
+        referrer: document.referrer,
+        user_agent: navigator.userAgent,
+      },
     });
   } catch (error) {
     console.error('Analytics tracking error:', error);
