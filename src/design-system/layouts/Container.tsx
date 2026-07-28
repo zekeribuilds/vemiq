@@ -37,18 +37,13 @@ export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
       width: '100%',
       maxWidth: sizeMap[size],
       margin: centered ? '0 auto' : '0',
-      padding: `0 ${spacing.sm}`,
       ...style,
-      '@media (min-width: 640px)': {
-        padding: `0 ${spacing.md}`,
-      },
-      '@media (min-width: 1024px)': {
-        padding: `0 ${spacing.lg}`,
-      },
     };
 
+    const responsivePadding = `px-4 md:px-6 lg:px-8`;
+
     return (
-      <div ref={ref} className={className} style={containerStyles} {...props}>
+      <div ref={ref} className={`${responsivePadding} ${className}`} style={containerStyles} {...props}>
         {children}
       </div>
     );
