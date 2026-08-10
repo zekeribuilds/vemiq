@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant Client
+  participant API as Vemiq API
+  participant DB as Supabase DB
+  participant Worker as intelligence-worker
+  participant Report as Report Context
+  Client->>API: POST evidence
+  API->>DB: Insert evidence_items
+  DB->>DB: Enqueue intelligence_jobs
+  Worker->>DB: Claim pending job
+  Worker->>DB: Write entities, insights, clarifications
+  Worker->>DB: Refresh documentation_health
+  Report->>DB: Read report_evidence_context
+  DB-->>Report: Evidence + insights + image placement

@@ -1,0 +1,17 @@
+flowchart TD
+  U[User] --> W[Workspace]
+  W --> E[Evidence Items]
+  E --> M[Evidence Media]
+  M --> I[Image Intelligence]
+  M --> S[Sketch Intelligence]
+  W --> H[Documentation Health]
+  W --> P[Documentation Pass]
+  W --> R[Recovery Sessions]
+  W --> L[Legacy Logbook]
+  W --> RP[Legacy Report]
+  T[Institution / Department Rules] --> RP
+  E --> RP
+  I --> RP
+  S --> RP
+  L --> RP
+  RP --> X[Existing Export Pipeline]
