@@ -16,11 +16,11 @@ export default function NavLink({ href, children, className }: NavLinkProps) {
   return (
     <Link
       href={href}
-      className={`text-muted-foreground hover:text-primary dark:hover:text-white transition-colors font-medium relative ${isActive ? 'text-primary' : ''} ${className || ''}`}
+      className={`text-sm text-[#898989] hover:text-[#FFFFFF] transition-colors font-medium relative ${isActive ? 'text-[#FFFFFF]' : ''} ${className || ''}`}
     >
       {children}
       {isActive && (
-        <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full" />
+        <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#6C63FF] rounded-full" />
       )}
     </Link>
   );

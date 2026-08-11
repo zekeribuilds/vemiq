@@ -47,8 +47,8 @@ export default function LoginPage() {
         userEmail: sessionResult.data.session?.user?.email
       });
 
-      // Redirect to dashboard - middleware will validate session
-      router.push('/dashboard');
+      // Redirect to home - middleware will validate session
+      router.push('/home');
     } catch (err: any) {
       console.error('[LOGIN] Sign in error:', err);
       if (err.message.includes('Missing Supabase environment variables')) {
@@ -99,18 +99,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#171717] flex flex-col">
       <Navbar />
-      <div className="flex items-center justify-center px-3 sm:px-4 pb-8 sm:pb-12 pt-20 sm:pt-24 flex-1">
-      <div className="max-w-sm w-full relative animate-fade-in-up">
-        <div className="text-center mb-4 sm:mb-6 mt-8 sm:mt-12">
-          <img src="/images/logo.svg" alt="Vemiq" className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4" />
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Sign in to Vemiq</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Continue your academic writing journey</p>
+      <div className="flex items-center justify-center px-4 py-8 pt-24 flex-1">
+      <div className="max-w-sm w-full">
+        <div className="text-center mb-6">
+          <img src="/images/logo.svg" alt="Vemiq" className="w-16 h-16 mx-auto mb-4" />
+          <h1 className="text-2xl font-semibold text-[#FFFFFF] mb-2">Sign in to Vemiq</h1>
+          <p className="text-sm text-[#898989]">Continue your academic writing journey</p>
         </div>
 
-        <Card className="p-4 sm:p-6 animate-scale-in" style={{ animationDelay: '0.1s' }}>
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <Card className="p-6 bg-[#1F1F1F] border border-[#2A2A2A] rounded-2xl">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"
               label="Email"
@@ -134,7 +134,7 @@ export default function LoginPage() {
             />
 
             {error && (
-              <div className="p-3 sm:p-4 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-xs sm:text-sm animate-fade-in">
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -150,13 +150,13 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
+                <div className="w-full border-t border-[#2A2A2A]" />
               </div>
-              <div className="relative flex justify-center text-xs sm:text-sm">
-                <span className="px-3 sm:px-4 bg-card text-muted-foreground">Or continue with</span>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-[#1F1F1F] text-[#898989]">Or continue with</span>
               </div>
             </div>
 
@@ -168,7 +168,7 @@ export default function LoginPage() {
               variant="secondary"
               className="mt-4"
               leftIcon={
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -192,9 +192,9 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-[#898989]">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-primary hover:opacity-80 font-medium transition-opacity">
+            <Link href="/signup" className="text-[#6C63FF] hover:opacity-80 font-medium transition-opacity">
               Sign up
             </Link>
           </p>

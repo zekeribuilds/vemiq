@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { DocumentsIcon, SparklesIcon, ZapIcon, ShieldIcon, CheckIcon, StarIcon, UsersIcon, TrendingUpIcon, PlayIcon } from '@/design-system';
+import { DocumentsIcon, SparklesIcon, ZapIcon, ShieldIcon, CheckIcon, StarIcon, UsersIcon, TrendingUpIcon, PlayIcon, ArrowRightIcon } from '@/design-system';
 import { Card } from '@/design-system/components/Card';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
@@ -16,53 +16,74 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export default function Home() {
 
   return (
-    <main className="min-h-screen bg-background m-0 p-0">
+    <main className="min-h-screen bg-[#171717]">
       <Navbar />
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background-secondary via-background to-background-tertiary py-12 sm:py-16 md:py-20 lg:py-24 px-3 sm:px-4 md:px-8 lg:px-16 pt-32 sm:pt-32 md:pt-40 lg:pt-48">
-        {/* Background decoration */}
+      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 px-4 md:px-8 pt-32 md:pt-40">
+        {/* Background gradient mesh */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 w-40 h-40 sm:w-80 sm:h-80 bg-background-tertiary/50 rounded-full blur-3xl animate-float" />
-          <div className="absolute -bottom-20 -left-20 sm:-bottom-40 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-background-tertiary/50 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#6C63FF]/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#6C63FF]/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#6C63FF]/5 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative">
-          <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
-            <h1 className={`${plusJakartaSans.className} text-3xl sm:text-sm md:text-3xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight text-center`}>
-              <span className="whitespace-nowrap">Document Your SIWES</span><br />
-              <span className="text-2xl sm:text-xs md:text-2xl lg:text-4xl block mt-0" style={{ color: '#8661ff' }}>Generate Your Report</span>
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `linear-gradient(to right, #6C63FF 1px, transparent 1px), linear-gradient(to bottom, #6C63FF 1px, transparent 1px)`,
+          backgroundSize: '50px 50px'
+        }} />
+
+        {/* Bottom gradient blend */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-[#171717] to-[#1F1F1F]" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className={`${plusJakartaSans.className} text-4xl md:text-5xl lg:text-6xl font-bold text-[#FFFFFF] mb-6 leading-tight`}>
+              Document Your SIWES
+              <br />
+              <span className="text-[#6C63FF]">Generate Your Report</span>
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-foreground max-w-3xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
+            
+            <p className="text-base md:text-lg text-[#898989] max-w-3xl mx-auto mb-10 leading-relaxed">
               Vemiq helps students capture activities, store evidence, and organize training records throughout their industrial attachment, making report writing a structured process instead of a last-minute rush.
             </p>
-            <div className="flex flex-row gap-3 sm:gap-4 justify-center px-2">
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link
                 href="/signup"
-                className="btn-primary inline-flex items-center justify-center text-sm sm:text-base py-2.5 sm:py-3"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#6C63FF] text-[#FFFFFF] rounded-xl hover:bg-[#6C63FF]/90 transition-all duration-200 font-semibold text-base hover:shadow-lg hover:shadow-[#6C63FF]/30 hover:-translate-y-0.5"
               >
                 Start Documenting
               </Link>
               <Link
                 href="/features"
-                className="btn-secondary inline-flex items-center justify-center gap-2 text-foreground text-sm sm:text-base py-2.5 sm:py-3"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#1F1F1F] text-[#FFFFFF] rounded-xl border border-[#2A2A2A] hover:border-[#6C63FF]/50 transition-all duration-200 font-semibold text-base hover:-translate-y-0.5"
               >
+                <PlayIcon size={18} />
                 How It Works
               </Link>
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 mt-6 sm:mt-12 text-muted-foreground flex-wrap px-2">
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-[#898989]">
               <div className="flex items-center gap-2">
-                <CheckIcon size={14} className="text-primary" />
-                <span className="text-[10px] sm:text-xs md:text-sm">Built for SWEP & SIWES Students</span>
+                <div className="w-5 h-5 rounded-full bg-[#6C63FF]/20 flex items-center justify-center">
+                  <CheckIcon size={12} className="text-[#6C63FF]" />
+                </div>
+                <span className="text-sm">Built for SWEP & SIWES Students</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckIcon size={14} className="text-primary" />
-                <span className="text-[10px] sm:text-xs md:text-sm">Keep Activities, Photos & Records in One Place</span>
+                <div className="w-5 h-5 rounded-full bg-[#6C63FF]/20 flex items-center justify-center">
+                  <CheckIcon size={12} className="text-[#6C63FF]" />
+                </div>
+                <span className="text-sm">Keep Activities, Photos & Records in One Place</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckIcon size={14} className="text-primary" />
-                <span className="text-[10px] sm:text-xs md:text-sm">Generate Institution-Ready Reports</span>
+                <div className="w-5 h-5 rounded-full bg-[#6C63FF]/20 flex items-center justify-center">
+                  <CheckIcon size={12} className="text-[#6C63FF]" />
+                </div>
+                <span className="text-sm">Generate Institution-Ready Reports</span>
               </div>
             </div>
           </div>
@@ -70,29 +91,45 @@ export default function Home() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-3 sm:px-4 md:px-8 lg:px-16 bg-background-secondary">
-        <div>
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary mb-2 sm:mb-4">
+      <section className="relative overflow-hidden py-16 md:py-24 px-4 md:px-8 bg-[#1F1F1F]">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-red-500/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
+        </div>
+
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `linear-gradient(to right, #6C63FF 1px, transparent 1px), linear-gradient(to bottom, #6C63FF 1px, transparent 1px)`,
+          backgroundSize: '50px 50px'
+        }} />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full mb-6">
+              <span className="text-sm text-red-400 font-medium">The Challenge</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#FFFFFF] mb-4">
               The Problem Students Face
             </h2>
-            <p className="text-sm sm:text-base md:text-xl text-text-secondary max-w-2xl mx-auto px-2">
+            <p className="text-base md:text-lg text-[#898989] max-w-2xl mx-auto">
               Industrial training reports shouldn't be a source of stress
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: DocumentsIcon, title: 'Poor Formatting', desc: 'Students struggle with proper academic formatting standards', color: 'error' },
-              { icon: ZapIcon, title: 'Last-Minute Stress', desc: 'Procrastination leads to rushed, low-quality submissions', color: 'warning' },
-              { icon: ShieldIcon, title: 'Rejected Reports', desc: 'Supervisors reject poorly formatted submissions', color: 'error' },
-              { icon: SparklesIcon, title: 'Copying Old Projects', desc: 'Students copy from seniors instead of creating original work', color: 'warning' },
+              { icon: DocumentsIcon, title: 'Poor Formatting', desc: 'Students struggle with proper academic formatting standards', color: 'red' },
+              { icon: ZapIcon, title: 'Last-Minute Stress', desc: 'Procrastination leads to rushed, low-quality submissions', color: 'orange' },
+              { icon: ShieldIcon, title: 'Rejected Reports', desc: 'Supervisors reject poorly formatted submissions', color: 'red' },
+              { icon: SparklesIcon, title: 'Copying Old Projects', desc: 'Students copy from seniors instead of creating original work', color: 'orange' },
             ].map((item, index) => (
-              <Card key={item.title} className="p-3 sm:p-4 md:p-6 animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-${item.color}-20 rounded-2xl sm:rounded-3xl flex items-center justify-center mb-2 sm:mb-4`}>
-                  <item.icon className={`text-${item.color}-500`} size={20} />
+              <Card key={item.title} className="p-6 bg-[#171717] border border-[#2A2A2A] rounded-2xl hover:border-[#6C63FF]/30 transition-all duration-300 hover:-translate-y-1">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color === 'red' ? 'bg-red-500/10' : 'bg-orange-500/10'}`}>
+                  <item.icon className={item.color === 'red' ? 'text-red-400' : 'text-orange-400'} size={24} />
                 </div>
-                <h3 className="font-semibold text-text-primary mb-1 sm:mb-2 text-sm sm:text-base md:text-lg">{item.title}</h3>
-                <p className="text-text-secondary text-[10px] sm:text-xs md:text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-semibold text-[#FFFFFF] mb-2 text-base">{item.title}</h3>
+                <p className="text-[#898989] text-sm leading-relaxed">{item.desc}</p>
               </Card>
             ))}
           </div>
@@ -100,17 +137,38 @@ export default function Home() {
       </section>
 
       {/* Solution Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-3 sm:px-4 md:px-8 lg:px-16 bg-background-secondary">
-        <div>
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary mb-2 sm:mb-4">
+      <section className="py-16 md:py-24 px-4 md:px-8 bg-[#171717] relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#6C63FF]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#6C63FF]/5 rounded-full blur-3xl" />
+        </div>
+
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `linear-gradient(to right, #6C63FF 1px, transparent 1px), linear-gradient(to bottom, #6C63FF 1px, transparent 1px)`,
+          backgroundSize: '50px 50px'
+        }} />
+
+        {/* Top gradient blend */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#1F1F1F] to-transparent" />
+        {/* Bottom gradient blend */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#1F1F1F]" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-[#6C63FF]/10 border border-[#6C63FF]/20 rounded-full mb-6">
+              <span className="text-sm text-[#6C63FF] font-medium">The Solution</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#FFFFFF] mb-4">
               How Vemiq Solves This
             </h2>
-            <p className="text-sm sm:text-base md:text-xl text-text-secondary max-w-2xl mx-auto px-2">
+            <p className="text-base md:text-lg text-[#898989] max-w-2xl mx-auto">
               Everything you need to create professional academic reports
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { title: 'AI-Assisted Writing', desc: 'Transform your weekly logs into professional academic content', icon: SparklesIcon },
               { title: 'Smart Formatting', desc: 'Automatic Times New Roman, 12pt, 1.5 spacing, proper margins', icon: DocumentsIcon },
@@ -119,12 +177,12 @@ export default function Home() {
               { title: 'Weekly Logbook', desc: 'Track activities with images and notes throughout your training', icon: CheckIcon },
               { title: 'Institution Ready', desc: 'Reports formatted to meet university standards', icon: StarIcon },
             ].map((item, index) => (
-              <Card key={item.title} className="p-3 sm:p-4 md:p-6 animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/20 rounded-full flex items-center justify-center mb-2 sm:mb-4">
-                  <item.icon className="text-primary" size={18} />
+              <Card key={item.title} className="p-6 bg-[#1F1F1F] border border-[#2A2A2A] rounded-2xl hover:border-[#6C63FF]/30 transition-all duration-300 hover:-translate-y-1">
+                <div className="w-12 h-12 rounded-xl bg-[#6C63FF]/10 flex items-center justify-center mb-4">
+                  <item.icon className="text-[#6C63FF]" size={24} />
                 </div>
-                <h3 className="font-semibold text-text-primary mb-1 sm:mb-2 text-sm sm:text-base md:text-lg">{item.title}</h3>
-                <p className="text-text-secondary text-[10px] sm:text-xs md:text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-semibold text-[#FFFFFF] mb-2 text-base">{item.title}</h3>
+                <p className="text-[#898989] text-sm leading-relaxed">{item.desc}</p>
               </Card>
             ))}
           </div>
@@ -132,32 +190,59 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-3 sm:px-4 md:px-8 lg:px-16 bg-background-secondary relative overflow-hidden">
+      <section className="relative overflow-hidden py-16 md:py-24 px-4 md:px-8 bg-[#1F1F1F]">
+        {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-10 -right-10 sm:-top-20 sm:-right-20 w-30 h-30 sm:w-60 sm:h-60 bg-background-tertiary/50 rounded-full blur-2xl animate-float" />
-          <div className="absolute -bottom-10 -left-10 sm:-bottom-20 sm:-left-20 w-30 h-30 sm:w-60 sm:h-60 bg-background-tertiary/50 rounded-full blur-2xl animate-float" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#6C63FF]/10 rounded-full blur-3xl" />
         </div>
-        <div className="text-center relative px-2">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary mb-3 sm:mb-6">
+
+        {/* Top gradient blend */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#171717] to-transparent" />
+
+        <div className="relative max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center px-4 py-2 bg-[#6C63FF]/10 border border-[#6C63FF]/20 rounded-full mb-6">
+            <span className="text-sm text-[#6C63FF] font-medium">Get Started Today</span>
+          </div>
+          
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#FFFFFF] mb-6">
             Ready to Transform Your Industrial Training Experience?
           </h2>
-          <p className="text-text-secondary mb-6 sm:mb-10 text-sm sm:text-base md:text-lg leading-relaxed px-2">
-            Join thousands of engineering students who are already using Vemiq
-            to create professional reports in minutes.
+          
+          <p className="text-base md:text-lg text-[#898989] mb-10 leading-relaxed max-w-2xl mx-auto">
+            Join thousands of engineering students who are already using Vemiq to create professional reports in minutes.
           </p>
-          <div className="flex flex-row gap-3 sm:gap-4 justify-center">
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-2.5 sm:py-4 bg-primary text-white rounded-xl sm:rounded-2xl hover:bg-primary/80 transition-all duration-200 font-semibold text-sm sm:text-base md:text-lg hover:shadow-lg hover:shadow-primary/30 active:scale-95 text-center"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#6C63FF] text-[#FFFFFF] rounded-xl hover:bg-[#6C63FF]/90 transition-all duration-200 font-semibold text-base hover:shadow-lg hover:shadow-[#6C63FF]/30 hover:-translate-y-0.5"
             >
               Get Started Free
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-4 bg-background-tertiary text-white rounded-xl sm:rounded-2xl hover:bg-background-tertiary/50 transition-all duration-200 font-semibold text-sm sm:text-base md:text-lg backdrop-blur-sm text-center border-2 border-white hover:shadow-lg hover:shadow-white/10"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#171717] text-[#FFFFFF] rounded-xl border border-[#2A2A2A] hover:border-[#6C63FF]/50 transition-all duration-200 font-semibold text-base hover:-translate-y-0.5"
             >
               View Pricing
             </Link>
+          </div>
+
+          {/* Social proof */}
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-[#898989]">
+            <div className="flex items-center gap-2">
+              <UsersIcon size={18} className="text-[#6C63FF]" />
+              <span className="text-sm">Trusted by students</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-[#2A2A2A]" />
+            <div className="flex items-center gap-2">
+              <StarIcon size={18} className="text-[#6C63FF]" />
+              <span className="text-sm">Professional reports</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-[#2A2A2A]" />
+            <div className="flex items-center gap-2">
+              <ShieldIcon size={18} className="text-[#6C63FF]" />
+              <span className="text-sm">Secure & private</span>
+            </div>
           </div>
         </div>
       </section>
