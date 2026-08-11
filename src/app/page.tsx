@@ -35,7 +35,7 @@ export default function Home() {
         }} />
 
         {/* Bottom gradient blend */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-[#171717] to-[#1F1F1F]" />
+        <div className="absolute bottom-0 left-0 right-0 h-30 bg-gradient-to-b from-[#171717] to-[#1F1F1F]" />
 
         <div className="relative max-w-6xl mx-auto">
           <div className="text-center mb-12">
