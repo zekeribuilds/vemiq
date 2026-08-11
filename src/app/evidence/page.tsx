@@ -36,7 +36,7 @@ export default function EvidencePage() {
       
       if (user) {
         const { data: workspacesData } = await supabase
-          .from('programs')
+          .from('workspaces')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
@@ -59,10 +59,10 @@ export default function EvidencePage() {
     try {
       const supabase = createClient();
       const { data: evidenceData } = await supabase
-        .from('evidence')
+        .from('evidence_items')
         .select('*')
-        .eq('program_id', selectedWorkspace)
-        .order('activity_date', { ascending: false });
+        .eq('workspace_id', selectedWorkspace)
+        .order('evidence_date', { ascending: false });
 
       // Group evidence by week
       const grouped: Record<number, any[]> = {};
@@ -142,7 +142,7 @@ export default function EvidencePage() {
                 >
                   {workspaces.map((workspace: any) => (
                     <option key={workspace.id} value={workspace.id}>
-                      {workspace.title}
+                      {workspace.name}
                     </option>
                   ))}
                 </select>

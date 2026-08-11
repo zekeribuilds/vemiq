@@ -12,10 +12,8 @@ import { Card } from '@/design-system/components/Card';
 export default function CreateProgramPage() {
   const router = useRouter();
   const [program, setProgram] = useState({
-    title: '',
-    type: 'SIWES',
-    organization_name: '',
-    supervisor_name: '',
+    name: '',
+    workspace_type: 'siwes',
     start_date: '',
     end_date: '',
   });
@@ -32,28 +30,42 @@ export default function CreateProgramPage() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        setError('User not authenticated');
+        setError('User not authenticated. Please sign in to create a workspace.');
         return;
       }
 
       const { error: insertError } = await supabase
-        .from('programs')
+        .from('workspaces')
         .insert({
           user_id: user.id,
-          title: program.title,
-          type: program.type,
-          organization_name: program.organization_name,
-          supervisor_name: program.supervisor_name,
+          name: program.name,
+          workspace_type: program.workspace_type,
           start_date: program.start_date,
           end_date: program.end_date,
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Supabase insert error:', insertError);
+        throw insertError;
+      }
 
       router.push('/evidence');
     } catch (err: any) {
-      console.error('Error creating program:', err);
-      setError(err.message || 'Failed to create program');
+      console.error('Error creating workspace:', err);
+      
+      // Better error message extraction
+      let errorMessage = 'Failed to create workspace';
+      if (err?.message) {
+        errorMessage = err.message;
+      } else if (err?.details) {
+        errorMessage = err.details;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err?.code) {
+        errorMessage = `Database error: ${err.code}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -66,7 +78,8 @@ export default function CreateProgramPage() {
       <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-xl md:text-2xl font-semibold text-[#FFFFFF]">Create Workspace</h1>
+          <h1 className="text-xl md:text-2xl font-semibold text-[#FFFFFF]">Create New Workspace</h1>
+          <p className="text-sm text-[#898989]">Set up a new workspace to track your industrial training evidence</p>
         </div>
 
         <Card className="p-6 bg-[#1F1F1F] border-[#2A2A2A] rounded-2xl">
@@ -77,9 +90,9 @@ export default function CreateProgramPage() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setProgram({ ...program, type: 'SIWES' })}
+                  onClick={() => setProgram({ ...program, workspace_type: 'siwes' })}
                   className={`flex-1 px-4 py-3 rounded-lg transition-all ${
-                    program.type === 'SIWES'
+                    program.workspace_type === 'siwes'
                       ? 'bg-[#6C63FF] text-white'
                       : 'bg-[#171717] text-[#898989] hover:bg-[#2A2A2A] hover:text-[#FFFFFF]'
                   }`}
@@ -88,9 +101,9 @@ export default function CreateProgramPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setProgram({ ...program, type: 'SWEP' })}
+                  onClick={() => setProgram({ ...program, workspace_type: 'swep' })}
                   className={`flex-1 px-4 py-3 rounded-lg transition-all ${
-                    program.type === 'SWEP'
+                    program.workspace_type === 'swep'
                       ? 'bg-[#6C63FF] text-white'
                       : 'bg-[#171717] text-[#898989] hover:bg-[#2A2A2A] hover:text-[#FFFFFF]'
                   }`}
@@ -103,30 +116,10 @@ export default function CreateProgramPage() {
             {/* Form Fields */}
             <div className="space-y-4">
               <Input
-                label="Title"
-                value={program.title}
-                onChange={(e) => setProgram({ ...program, title: e.target.value })}
+                label="Workspace Name"
+                value={program.name}
+                onChange={(e) => setProgram({ ...program, name: e.target.value })}
                 placeholder="e.g., SIWES 2026"
-                required
-                fullWidth
-                className="rounded-lg"
-              />
-
-              <Input
-                label="Organization"
-                value={program.organization_name}
-                onChange={(e) => setProgram({ ...program, organization_name: e.target.value })}
-                placeholder="e.g., Tech Company Ltd"
-                required
-                fullWidth
-                className="rounded-lg"
-              />
-
-              <Input
-                label="Supervisor"
-                value={program.supervisor_name}
-                onChange={(e) => setProgram({ ...program, supervisor_name: e.target.value })}
-                placeholder="e.g., Dr. John Doe"
                 required
                 fullWidth
                 className="rounded-lg"
@@ -179,7 +172,7 @@ export default function CreateProgramPage() {
                 className="bg-[#6C63FF] hover:bg-[#5A52D5] rounded-lg py-3 flex-1"
                 leftIcon={<VemiqIcon category="action" name="create" size={16} />}
               >
-                <span className="text-sm font-medium">{isSubmitting ? 'Creating...' : 'Create'}</span>
+                <span className="text-sm font-medium">{isSubmitting ? 'Creating Workspace...' : 'Create Workspace'}</span>
               </Button>
             </div>
           </form>

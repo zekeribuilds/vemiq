@@ -1,26 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { uploadFile } from '@/lib/storage';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+    
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const userId = formData.get('userId') as string;
     const linkedTo = formData.get('linkedTo') as string | null;
     const fileType = formData.get('fileType') as string;
 
-    if (!file || !userId) {
+    if (!file) {
       return NextResponse.json(
-        { error: 'File and userId are required' },
+        { error: 'File is required' },
         { status: 400 }
       );
     }
 
-    // Upload file to storage
+    // Upload file to storage (use logbook-files bucket as per schema)
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}/${Date.now()}.${fileExt}`;
-    const { path, publicUrl } = await uploadFile(file, 'uploads', fileName);
+    const { path, publicUrl } = await uploadFile(file, 'logbook-files', fileName);
 
     // Create upload record in database
     const supabase = await createClient();
@@ -71,38 +74,47 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+    
     const { searchParams } = new URL(request.url);
     const uploadId = searchParams.get('uploadId');
-    const userId = searchParams.get('userId');
 
-    if (!uploadId || !userId) {
+    if (!uploadId) {
       return NextResponse.json(
-        { error: 'uploadId and userId are required' },
+        { error: 'uploadId is required' },
         { status: 400 }
       );
     }
 
     const supabase = await createClient();
 
-    // Get upload details
+    // Get upload details and verify ownership
     const { data: upload, error: fetchError } = await supabase
       .from('uploads')
       .select('*')
       .eq('id', uploadId)
+      .eq('user_id', userId)
       .single();
 
-    if (fetchError) throw fetchError;
-
-    const storagePath = upload.file_url.split('/uploads/').pop();
-    if (storagePath) {
-      await supabase.storage.from('uploads').remove([storagePath]);
+    if (fetchError || !upload) {
+      return NextResponse.json(
+        { error: 'Upload not found or access denied' },
+        { status: 404 }
+      );
     }
 
-    // Delete from database
+    const storagePath = upload.file_url.split('/logbook-files/').pop();
+    if (storagePath) {
+      await supabase.storage.from('logbook-files').remove([storagePath]);
+    }
+
+    // Delete from database (verify ownership)
     const { error: deleteError } = await supabase
       .from('uploads')
       .delete()
-      .eq('id', uploadId);
+      .eq('id', uploadId)
+      .eq('user_id', userId);
 
     if (deleteError) throw deleteError;
 

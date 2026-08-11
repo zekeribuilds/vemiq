@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPaystackService } from '@/lib/payments/paystackService';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    await requireAuth();
+    
     const body = await request.json();
     const { reference } = body;
 

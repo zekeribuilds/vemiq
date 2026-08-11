@@ -33,7 +33,12 @@ export default function ProfilePage() {
         
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('*')
+          .select(`
+            *,
+            institution:institutions(name),
+            faculty:faculties(name),
+            department:departments(name)
+          `)
           .eq('id', userData.user.id)
           .single();
 
@@ -66,24 +71,38 @@ export default function ProfilePage() {
     setIsSaving(true);
     try {
       const supabase = createClient();
-      const { error } = await supabase
+      
+      console.log('Saving profile data:', editedProfile);
+      console.log('User ID:', user.id);
+      
+      // Build update object with only fields that exist in database and are editable
+      const updateData: any = {
+        full_name: editedProfile.full_name,
+        matric_number: editedProfile.matric_number,
+        academic_session: editedProfile.academic_session,
+      };
+
+      const { data, error } = await supabase
         .from('profiles')
-        .update({
-          full_name: editedProfile.full_name,
-          institution: editedProfile.institution,
-          department: editedProfile.department,
-          level: editedProfile.level,
-          matric_number: editedProfile.matric_number,
-        })
-        .eq('id', user.id);
+        .update(updateData)
+        .eq('id', user.id)
+        .select();
 
-      if (error) throw error;
+      console.log('Update result:', { data, error });
 
-      setProfile(editedProfile);
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
+
+      // Reload profile data from database to ensure consistency
+      await loadProfile();
+
       setIsEditing(false);
       setEditedProfile(null);
     } catch (error) {
       console.error('Error saving profile:', error);
+      alert('Failed to save profile. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -91,6 +110,18 @@ export default function ProfilePage() {
 
   const handleInputChange = (field: string, value: string) => {
     setEditedProfile((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSupport = () => {
+    window.open('mailto:support@vemiq.com?subject=Support Request', '_blank');
+  };
+
+  const handleReportBug = () => {
+    window.open('mailto:bugs@vemiq.com?subject=Bug Report', '_blank');
+  };
+
+  const handleRateUs = () => {
+    window.open('https://github.com/yourusername/vemiq', '_blank');
   };
 
   return (
@@ -157,14 +188,14 @@ export default function ProfilePage() {
                 </div>
                 <div className="text-center">
                   <h2 className="text-2xl md:text-3xl font-bold text-[#FFFFFF] mb-2">{profile.full_name}</h2>
-                  <p className="text-base md:text-lg text-[#898989] mb-1">{profile.institution}</p>
+                  <p className="text-base md:text-lg text-[#898989] mb-1">{profile.institution?.name || 'Not specified'}</p>
                   <p className="text-sm text-[#898989]">{user.email}</p>
                   <div className="flex flex-wrap gap-2 mt-4 justify-center">
                     <span className="px-4 py-1.5 bg-[#6C63FF]/20 text-[#6C63FF] rounded-full text-sm font-medium border border-[#6C63FF]/30">
-                      {profile.level}
+                      {profile.department?.name || 'Not specified'}
                     </span>
                     <span className="px-4 py-1.5 bg-[#2A2A2A] text-[#898989] rounded-full text-sm border border-[#3A3A3A]">
-                      {profile.department}
+                      {profile.faculty?.name || 'Not specified'}
                     </span>
                   </div>
                 </div>
@@ -176,14 +207,12 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl md:text-2xl font-bold text-[#FFFFFF]">Student Information</h3>
                 {!isEditing && (
-                  <Button
-                    variant="secondary"
-                    className="bg-[#2A2A2A] hover:bg-[#3A3A3A] border-[#2A2A2A] rounded-xl h-10 px-4"
-                    leftIcon={<VemiqIcon category="action" name="edit" size={16} />}
+                  <button
                     onClick={handleEdit}
+                    className="p-2 text-[#898989] hover:text-[#FFFFFF] transition-colors"
                   >
-                    <span className="text-sm font-medium">Edit</span>
-                  </Button>
+                    <VemiqIcon category="action" name="edit" size={20} />
+                  </button>
                 )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -203,44 +232,17 @@ export default function ProfilePage() {
                 
                 <div className="p-4 bg-[#171717] rounded-xl space-y-2">
                   <p className="text-xs text-[#898989] font-medium uppercase tracking-wide">Institution</p>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedProfile?.institution || ''}
-                      onChange={(e) => handleInputChange('institution', e.target.value)}
-                      className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:border-[#6C63FF]"
-                    />
-                  ) : (
-                    <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.institution}</p>
-                  )}
+                  <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.institution?.name || 'Not specified'}</p>
+                </div>
+                
+                <div className="p-4 bg-[#171717] rounded-xl space-y-2">
+                  <p className="text-xs text-[#898989] font-medium uppercase tracking-wide">Faculty</p>
+                  <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.faculty?.name || 'Not specified'}</p>
                 </div>
                 
                 <div className="p-4 bg-[#171717] rounded-xl space-y-2">
                   <p className="text-xs text-[#898989] font-medium uppercase tracking-wide">Department</p>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedProfile?.department || ''}
-                      onChange={(e) => handleInputChange('department', e.target.value)}
-                      className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:border-[#6C63FF]"
-                    />
-                  ) : (
-                    <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.department}</p>
-                  )}
-                </div>
-                
-                <div className="p-4 bg-[#171717] rounded-xl space-y-2">
-                  <p className="text-xs text-[#898989] font-medium uppercase tracking-wide">Level</p>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedProfile?.level || ''}
-                      onChange={(e) => handleInputChange('level', e.target.value)}
-                      className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:border-[#6C63FF]"
-                    />
-                  ) : (
-                    <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.level}</p>
-                  )}
+                  <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.department?.name || 'Not specified'}</p>
                 </div>
                 
                 <div className="p-4 bg-[#171717] rounded-xl space-y-2">
@@ -253,7 +255,21 @@ export default function ProfilePage() {
                       className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:border-[#6C63FF]"
                     />
                   ) : (
-                    <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.matric_number}</p>
+                    <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.matric_number || 'Not specified'}</p>
+                  )}
+                </div>
+
+                <div className="p-4 bg-[#171717] rounded-xl space-y-2">
+                  <p className="text-xs text-[#898989] font-medium uppercase tracking-wide">Academic Session</p>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editedProfile?.academic_session || ''}
+                      onChange={(e) => handleInputChange('academic_session', e.target.value)}
+                      className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:border-[#6C63FF]"
+                    />
+                  ) : (
+                    <p className="text-base md:text-lg text-[#FFFFFF] font-semibold">{profile.academic_session || 'Not specified'}</p>
                   )}
                 </div>
 
@@ -290,43 +306,37 @@ export default function ProfilePage() {
             </Card>
 
             {/* Actions Grid */}
-            <Card className="p-6 bg-[#1F1F1F] border-[#2A2A2A] rounded-2xl">
-              <h3 className="text-lg font-bold text-[#FFFFFF] mb-4">Quick Actions</h3>
-              <div className="space-y-3">
+            <Card className="p-4 bg-[#1F1F1F] border-[#2A2A2A] rounded-2xl">
+              <h3 className="text-sm font-semibold text-[#898989] uppercase tracking-wide mb-3">Quick Actions</h3>
+              <div className="grid grid-cols-3 gap-3">
                 <button
-                  className="w-full flex items-center gap-4 px-5 py-4 bg-[#171717] hover:bg-[#2A2A2A] rounded-xl transition-all group"
+                  onClick={handleSupport}
+                  className="flex flex-col items-center gap-2 p-3 bg-[#171717] hover:bg-[#2A2A2A] rounded-lg transition-all group"
                 >
-                  <div className="w-10 h-10 bg-[#2A2A2A] group-hover:bg-[#3A3A3A] rounded-lg flex items-center justify-center transition-colors">
-                    <VemiqIcon category="nav" name="settings" size={20} className="text-[#898989] group-hover:text-[#FFFFFF]" />
+                  <div className="w-8 h-8 bg-[#6C63FF]/10 group-hover:bg-[#6C63FF]/20 rounded-lg flex items-center justify-center transition-colors">
+                    <VemiqIcon category="nav" name="settings" size={18} className="text-[#6C63FF]" />
                   </div>
-                  <div className="flex-1 text-left">
-                    <span className="text-[#FFFFFF] font-medium">Support</span>
-                  </div>
-                  <VemiqIcon category="action" name="add" size={16} className="text-[#898989]" />
+                  <span className="text-xs text-[#FFFFFF] font-medium">Support</span>
                 </button>
                 
                 <button
-                  className="w-full flex items-center gap-4 px-5 py-4 bg-[#171717] hover:bg-[#2A2A2A] rounded-xl transition-all group"
+                  onClick={handleReportBug}
+                  className="flex flex-col items-center gap-2 p-3 bg-[#171717] hover:bg-[#2A2A2A] rounded-lg transition-all group"
                 >
-                  <div className="w-10 h-10 bg-[#2A2A2A] group-hover:bg-[#3A3A3A] rounded-lg flex items-center justify-center transition-colors">
-                    <VemiqIcon category="status" name="error" size={20} className="text-[#898989] group-hover:text-[#FFFFFF]" />
+                  <div className="w-8 h-8 bg-[#EF4444]/10 group-hover:bg-[#EF4444]/20 rounded-lg flex items-center justify-center transition-colors">
+                    <VemiqIcon category="status" name="error" size={18} className="text-[#EF4444]" />
                   </div>
-                  <div className="flex-1 text-left">
-                    <span className="text-[#FFFFFF] font-medium">Report Bug</span>
-                  </div>
-                  <VemiqIcon category="action" name="add" size={16} className="text-[#898989]" />
+                  <span className="text-xs text-[#FFFFFF] font-medium">Report Bug</span>
                 </button>
                 
                 <button
-                  className="w-full flex items-center gap-4 px-5 py-4 bg-[#171717] hover:bg-[#2A2A2A] rounded-xl transition-all group"
+                  onClick={handleRateUs}
+                  className="flex flex-col items-center gap-2 p-3 bg-[#171717] hover:bg-[#2A2A2A] rounded-lg transition-all group"
                 >
-                  <div className="w-10 h-10 bg-[#2A2A2A] group-hover:bg-[#3A3A3A] rounded-lg flex items-center justify-center transition-colors">
-                    <VemiqIcon category="status" name="success" size={20} className="text-[#898989] group-hover:text-[#FFFFFF]" />
+                  <div className="w-8 h-8 bg-[#22C55E]/10 group-hover:bg-[#22C55E]/20 rounded-lg flex items-center justify-center transition-colors">
+                    <VemiqIcon category="status" name="success" size={18} className="text-[#22C55E]" />
                   </div>
-                  <div className="flex-1 text-left">
-                    <span className="text-[#FFFFFF] font-medium">Rate Us</span>
-                  </div>
-                  <VemiqIcon category="action" name="add" size={16} className="text-[#898989]" />
+                  <span className="text-xs text-[#FFFFFF] font-medium">Rate Us</span>
                 </button>
               </div>
             </Card>

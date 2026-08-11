@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+
     const body = await request.json();
     const { weekId, logbookId, dailyEntries } = body;
 
@@ -24,6 +28,7 @@ export async function POST(request: NextRequest) {
         training_organization:training_organizations(name)
       `)
       .eq('id', logbookId)
+      .eq('user_id', userId)
       .single();
 
     if (logbookError) throw logbookError;
@@ -32,6 +37,7 @@ export async function POST(request: NextRequest) {
       .from('logbook_entries')
       .select('*')
       .eq('logbook_id', logbookId)
+      .eq('user_id', userId)
       .eq('week_number', weekNumber)
       .order('entry_date', { ascending: true });
 
@@ -41,6 +47,7 @@ export async function POST(request: NextRequest) {
     const { data: uploadsData } = await supabase
       .from('uploads')
       .select('*')
+      .eq('user_id', userId)
       .eq('linked_to', `${logbookId}:week:${weekId}`)
       .order('created_at', { ascending: false });
 
@@ -74,6 +81,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('AI summary error:', error);
+    // Don't leak sensitive error details to client
     return NextResponse.json(
       { error: 'Failed to generate summary' },
       { status: 500 }

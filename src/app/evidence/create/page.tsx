@@ -41,19 +41,19 @@ export default function CreateEvidencePage() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        const { data: programsData } = await supabase
-          .from('programs')
+        const { data: workspacesData } = await supabase
+          .from('workspaces')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
-        setPrograms(programsData || []);
-        if (programsData && programsData.length > 0) {
-          setSelectedProgram(programsData[0].id);
+        setPrograms(workspacesData || []);
+        if (workspacesData && workspacesData.length > 0) {
+          setSelectedProgram(workspacesData[0].id);
         }
       }
     } catch (error) {
-      console.error('Error loading programs:', error);
+      console.error('Error loading workspaces:', error);
     }
   };
 
@@ -91,21 +91,28 @@ export default function CreateEvidencePage() {
         return;
       }
 
-      // Calculate week number based on program start date
-      const program = programs.find((p) => p.id === selectedProgram);
-      const startDate = new Date(program.start_date);
+      // Calculate week number based on workspace start date
+      const workspace = programs.find((p) => p.id === selectedProgram);
+      const startDate = new Date(workspace.start_date);
       const today = new Date();
       const weekNumber = Math.floor((today.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
 
+      // Map method to source_type enum
+      const sourceTypeMap: Record<EvidenceMethod, string> = {
+        voice: 'voice',
+        photo: 'photo', 
+        text: 'text'
+      };
+
       const { error: insertError } = await supabase
-        .from('evidence')
+        .from('evidence_items')
         .insert({
           user_id: user.id,
-          program_id: selectedProgram,
+          workspace_id: selectedProgram,
           title: method === 'voice' ? 'Voice Recording' : method === 'photo' ? 'Photo Evidence' : 'Text Note',
-          transcript: method === 'text' ? textEvidence : null,
-          summary: method === 'text' ? textEvidence.substring(0, 200) : null,
-          activity_date: today.toISOString().split('T')[0],
+          description: method === 'text' ? textEvidence : null,
+          source_type: sourceTypeMap[method],
+          evidence_date: today.toISOString().split('T')[0],
           week_number: Math.max(1, weekNumber),
         });
 
@@ -114,7 +121,8 @@ export default function CreateEvidencePage() {
       router.push('/evidence');
     } catch (err: any) {
       console.error('Error creating evidence:', err);
-      setError(err.message || 'Failed to create evidence');
+      // Don't leak sensitive error details to client
+      setError('Failed to create evidence');
     } finally {
       setIsSubmitting(false);
     }
@@ -145,9 +153,9 @@ export default function CreateEvidencePage() {
               onChange={(e) => setSelectedProgram(e.target.value)}
               className="px-3 py-2 bg-[#1F1F1F] border border-[#2A2A2A] rounded-lg text-[#FFFFFF] text-sm focus:border-[#6C63FF] focus:outline-none transition-all"
             >
-              {programs.map((program) => (
-                <option key={program.id} value={program.id}>
-                  {program.title}
+              {programs.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.name}
                 </option>
               ))}
             </select>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth-helpers';
 
 // Helper function to determine file_type from mime_type
 function getFileType(mimeType: string): 'image' | 'voice' | 'document' {
@@ -10,21 +11,16 @@ function getFileType(mimeType: string): 'image' | 'voice' | 'document' {
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+    
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const userId = formData.get('userId') as string;
     const linkedTo = formData.get('linkedTo') as string | null;
 
     if (!file) {
       return NextResponse.json(
         { error: 'No file provided' },
-        { status: 400 }
-      );
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
         { status: 400 }
       );
     }
@@ -49,13 +45,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Generate unique filename
-    const fileExt = file.name.split('.').pop();
+    // Generate unique filename with sanitized extension
+    const fileExt = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
     const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
 
-    // Upload to Supabase storage
+    // Upload to Supabase storage (use logbook-files bucket as per schema)
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('uploads')
+      .from('logbook-files')
       .upload(fileName, file, {
         upsert: false,
       });
@@ -68,10 +64,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage
-      .from('uploads')
-      .getPublicUrl(fileName);
+    // Get signed URL for private bucket
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+      .from('logbook-files')
+      .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 days expiry
+
+    if (signedUrlError || !signedUrlData) {
+      console.error('Signed URL error:', signedUrlError);
+      // Rollback storage upload if signed URL generation fails
+      await supabase.storage.from('logbook-files').remove([fileName]);
+      return NextResponse.json(
+        { error: 'Failed to generate file access URL' },
+        { status: 500 }
+      );
+    }
 
     // Determine file_type (image, voice, document)
     const fileType = getFileType(file.type);
@@ -81,7 +87,7 @@ export async function POST(request: NextRequest) {
       .from('uploads')
       .insert({
         user_id: userId,
-        file_url: publicUrlData.publicUrl,
+        file_url: signedUrlData.signedUrl,
         file_type: fileType,
         linked_to: linkedTo || null,
       })
@@ -119,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: uploadRecord.id,
-      url: publicUrlData.publicUrl,
+      url: signedUrlData.signedUrl,
       linked_to: uploadRecord.linked_to,
       file_type: fileType,
       mime_type: file.type,
@@ -137,13 +143,15 @@ export async function POST(request: NextRequest) {
 // DELETE endpoint for removing uploads
 export async function DELETE(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+    
     const { searchParams } = new URL(request.url);
     const uploadId = searchParams.get('uploadId');
-    const userId = searchParams.get('userId');
 
-    if (!uploadId || !userId) {
+    if (!uploadId) {
       return NextResponse.json(
-        { error: 'Upload ID and User ID are required' },
+        { error: 'Upload ID is required' },
         { status: 400 }
       );
     }
@@ -175,7 +183,7 @@ export async function DELETE(request: NextRequest) {
 
     // Delete from storage
     const { error: storageError } = await supabase.storage
-      .from('uploads')
+      .from('logbook-files')
       .remove([storagePath]);
 
     if (storageError) {

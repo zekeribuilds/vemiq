@@ -29,15 +29,80 @@ interface ReportData {
   };
 }
 
+/**
+ * Sanitizes HTML content to prevent XSS attacks in PDF generation.
+ * Removes dangerous tags and attributes while preserving safe formatting.
+ */
+function sanitizeHTML(content: string): string {
+  if (!content) return '';
+
+  // Remove script tags and their content
+  let sanitized = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
+  // Remove dangerous event handlers
+  sanitized = sanitized.replace(/\s+on\w+="[^"]*"/gi, '');
+  sanitized = sanitized.replace(/\s+on\w+='[^']*'/gi, '');
+
+  // Remove javascript: protocol
+  sanitized = sanitized.replace(/javascript:/gi, '');
+
+  // Remove data: protocol (except for images)
+  sanitized = sanitized.replace(/data:(?!image\/)/gi, '');
+
+  // Remove iframe, object, embed tags
+  sanitized = sanitized.replace(/<(iframe|object|embed|form|input|button)[^>]*>/gi, '');
+
+  // Remove style tags that could contain malicious CSS
+  sanitized = sanitized.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+  return sanitized;
+}
+
+/**
+ * Escapes HTML special characters to prevent XSS
+ */
+function escapeHTML(text: string): string {
+  if (!text) return '';
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (char) => map[char]);
+}
+
 export function generateReportHTML(data: ReportData): string {
   const { title, reportType, studentInfo, reportStructure, sections } = data;
+
+  // Sanitize all user-provided content
+  const safeTitle = escapeHTML(title);
+  const safeFullName = escapeHTML(studentInfo.fullName);
+  const safeMatricNumber = escapeHTML(studentInfo.matricNumber);
+  const safeDepartment = escapeHTML(studentInfo.department);
+  const safeFaculty = escapeHTML(studentInfo.faculty);
+  const safeUniversity = escapeHTML(studentInfo.university);
+  const safeCompanyName = escapeHTML(studentInfo.companyName);
+  const safeSupervisorName = escapeHTML(studentInfo.supervisorName);
+  const safeCoordinatorName = escapeHTML(studentInfo.coordinatorName);
+  const safeDuration = escapeHTML(studentInfo.duration);
+  const safeStartDate = escapeHTML(studentInfo.startDate);
+  const safeEndDate = escapeHTML(studentInfo.endDate);
+
+  // Sanitize HTML content (preserve safe formatting)
+  const safeIntroduction = sanitizeHTML(sections.introduction || '');
+  const safeCompanyOverview = sanitizeHTML(sections.companyOverview || '');
+  const safeActivities = sanitizeHTML(sections.activities || '');
+  const safeChallenges = sanitizeHTML(sections.challenges || '');
+  const safeConclusion = sanitizeHTML(sections.conclusion || '');
 
   return `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>${title}</title>
+  <title>${safeTitle}</title>
   <style>
     @page {
       size: A4;
@@ -131,18 +196,18 @@ export function generateReportHTML(data: ReportData): string {
     <h1>${reportType} REPORT</h1>
     <h2>ON</h2>
     <h1>INDUSTRIAL TRAINING</h1>
-    
+
     <div style="margin-top: 40pt;">
       <p><strong>BY</strong></p>
-      <p style="font-size: 14pt;">${studentInfo.fullName}</p>
-      <p style="font-size: 12pt;">${studentInfo.matricNumber}</p>
+      <p style="font-size: 14pt;">${safeFullName}</p>
+      <p style="font-size: 12pt;">${safeMatricNumber}</p>
     </div>
-    
+
     <div style="margin-top: 40pt;">
       <p><strong>SUBMITTED TO</strong></p>
-      <p>${studentInfo.university}</p>
-      <p>${studentInfo.faculty}</p>
-      <p>${studentInfo.department}</p>
+      <p>${safeUniversity}</p>
+      <p>${safeFaculty}</p>
+      <p>${safeDepartment}</p>
     </div>
     
     <div style="margin-top: 40pt;">
@@ -158,19 +223,19 @@ export function generateReportHTML(data: ReportData): string {
     <p>
       This is to certify that this ${reportType} report titled
       &quot;INDUSTRIAL TRAINING REPORT&quot; was carried out by
-      <strong>${studentInfo.fullName}</strong> with Matric Number
-      <strong>${studentInfo.matricNumber}</strong> under my supervision.
+      <strong>${safeFullName}</strong> with Matric Number
+      <strong>${safeMatricNumber}</strong> under my supervision.
     </p>
-    
+
     <div class="certification">
       <div class="signature-line">
         <p>______________________</p>
-        <p>Supervisor: ${studentInfo.supervisorName}</p>
+        <p>Supervisor: ${safeSupervisorName}</p>
       </div>
-      
+
       <div class="signature-line">
         <p>______________________</p>
-        <p>Coordinator: ${studentInfo.coordinatorName}</p>
+        <p>Coordinator: ${safeCoordinatorName}</p>
       </div>
       
       <div class="signature-line">
@@ -197,16 +262,16 @@ export function generateReportHTML(data: ReportData): string {
     <h2>ACKNOWLEDGEMENT</h2>
     <p>
       I wish to express my sincere gratitude to my supervisor,
-      <strong>${studentInfo.supervisorName}</strong>, for his guidance and
+      <strong>${safeSupervisorName}</strong>, for his guidance and
       support throughout this industrial training program. I also thank the
-      management and staff of <strong>${studentInfo.companyName}</strong> for
-      the opportunity and mentorship provided during my ${studentInfo.duration}
+      management and staff of <strong>${safeCompanyName}</strong> for
+      the opportunity and mentorship provided during my ${safeDuration}
       training period.
     </p>
     <p>
       My appreciation also goes to my course coordinator,
-      <strong>${studentInfo.coordinatorName}</strong>, and the entire faculty
-      of ${studentInfo.faculty}, ${studentInfo.university}, for their
+      <strong>${safeCoordinatorName}</strong>, and the entire faculty
+      of ${safeFaculty}, ${safeUniversity}, for their
       academic guidance and support.
     </p>
   </div>
@@ -218,10 +283,10 @@ export function generateReportHTML(data: ReportData): string {
     <h2>ABSTRACT</h2>
     <p>
       This report details my industrial training experience at
-      <strong>${studentInfo.companyName}</strong> over a period of
-      <strong>${studentInfo.duration}</strong> from
-      <strong>${studentInfo.startDate}</strong> to
-      <strong>${studentInfo.endDate}</strong>. The training covered various
+      <strong>${safeCompanyName}</strong> over a period of
+      <strong>${safeDuration}</strong> from
+      <strong>${safeStartDate}</strong> to
+      <strong>${safeEndDate}</strong>. The training covered various
       aspects of practical engineering applications, including hands-on
       experience with industrial equipment, project management, and teamwork.
     </p>
@@ -299,7 +364,7 @@ export function generateReportHTML(data: ReportData): string {
   <!-- Chapter 1: Introduction -->
   <div class="page">
     <h2>CHAPTER 1: INTRODUCTION</h2>
-    ${sections.introduction}
+    ${safeIntroduction}
   </div>
   ` : ''}
 
@@ -307,7 +372,7 @@ export function generateReportHTML(data: ReportData): string {
   <!-- Chapter 2: Company Overview -->
   <div class="page">
     <h2>CHAPTER 2: COMPANY OVERVIEW</h2>
-    ${sections.companyOverview}
+    ${safeCompanyOverview}
   </div>
   ` : ''}
 
@@ -315,7 +380,7 @@ export function generateReportHTML(data: ReportData): string {
   <!-- Chapter 3: Activities Performed -->
   <div class="page">
     <h2>CHAPTER 3: ACTIVITIES PERFORMED</h2>
-    ${sections.activities}
+    ${safeActivities}
   </div>
   ` : ''}
 
@@ -323,7 +388,7 @@ export function generateReportHTML(data: ReportData): string {
   <!-- Chapter 4: Challenges and Solutions -->
   <div class="page">
     <h2>CHAPTER 4: CHALLENGES AND SOLUTIONS</h2>
-    ${sections.challenges}
+    ${safeChallenges}
   </div>
   ` : ''}
 
@@ -331,7 +396,7 @@ export function generateReportHTML(data: ReportData): string {
   <!-- Chapter 5: Conclusion -->
   <div class="page">
     <h2>CHAPTER 5: CONCLUSION AND RECOMMENDATIONS</h2>
-    ${sections.conclusion}
+    ${safeConclusion}
   </div>
   ` : ''}
 </body>

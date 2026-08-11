@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAIService } from '@/lib/ai/aiService';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    await requireAuth();
+    
     const body = await request.json();
     const { message, sectionContent, sectionId } = body;
 

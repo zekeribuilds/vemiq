@@ -41,7 +41,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-[#2A2A2A] pt-6 flex items-center justify-between text-xs text-[#898989]">
-          <div>© Vemiq Corp</div>
+          <div>© Vemiq Corporation</div>
         </div>
       </div>
     </footer>

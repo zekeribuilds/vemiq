@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPaystackService } from '@/lib/payments/paystackService';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+    
     const body = await request.json();
     const { reference } = body;
 
@@ -21,6 +25,7 @@ export async function POST(request: NextRequest) {
       .from('payments')
       .select('*')
       .eq('reference', reference)
+      .eq('user_id', userId)
       .single();
 
     if (existingPayment && existingPayment.status === 'completed') {
@@ -38,7 +43,7 @@ export async function POST(request: NextRequest) {
     const response = await paystackService.verifyTransaction(reference);
 
     if (response.status && response.data.status === 'success') {
-      // Update payment record
+      // Update payment record (ensure user ownership)
       const { data: paymentData, error: updateError } = await supabase
         .from('payments')
         .update({ 
@@ -46,6 +51,7 @@ export async function POST(request: NextRequest) {
           paid_at: new Date().toISOString(),
         })
         .eq('reference', reference)
+        .eq('user_id', userId)
         .eq('status', 'pending')
         .select()
         .single();

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPDFService } from '@/lib/pdf/pdfService';
 import { generateReportHTML } from '@/lib/pdf/reportTemplate';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    await requireAuth();
+    
     const body = await request.json();
     const { reportData } = body;
 

@@ -13,7 +13,7 @@ export default function CreateLogbookPage() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    programType: 'SIWES' as 'SIWES' | 'SWEP',
+    programType: 'SIWES' as 'SIWES' | 'SWEP', // Note: this uses the correct enum from backend
     organization: '',
   });
 

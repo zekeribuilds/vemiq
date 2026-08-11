@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAIService } from '@/lib/ai/aiService';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const userId = await requireAuth();
+
     const body = await request.json();
     const { action, content } = body;
 
@@ -48,6 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ response, updatedContent });
   } catch (error) {
     console.error('AI edit error:', error);
+    // Don't leak sensitive error details to client
     return NextResponse.json(
       { error: 'Failed to process edit request' },
       { status: 500 }

@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPaystackService } from '@/lib/payments/paystackService';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth-helpers';
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const authenticatedUserId = await requireAuth();
+    
     const body = await request.json();
     const { userId, email, amount, pageCount, reportType, companyName } = body;
 
-    if (!userId || !email || !amount || !pageCount) {
+    // Ensure the authenticated user matches the userId in the request
+    if (userId !== authenticatedUserId) {
+      return NextResponse.json(
+        { error: 'Unauthorized access' },
+        { status: 403 }
+      );
+    }
+
+    if (!email || !amount || !pageCount) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
